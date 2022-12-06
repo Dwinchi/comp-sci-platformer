@@ -1,0 +1,10 @@
+.game-layers {
+    position: absolute;
+    image-rendering: pixelated;
+    border: 1px solid #444;
+}
+
+body {
+    background: #111;
+    margin:0
+}
