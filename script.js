@@ -26,6 +26,7 @@ let tilesets = [
 let BTN = [0,0,0,0,0,0,0];
 let AXIS = [0,0];
 let TIMER;
+let grav = 0.5;
 
 var fps = document.getElementById("fps");
 var startTime = Date.now();
@@ -40,6 +41,7 @@ let p = {
     accel:0.5,
     deccel:0.25,
     maxSpd:2,
+    jumpSpd:6,
     xSpd:0,
     ySpd:0,
     physAtk:10,
@@ -70,7 +72,7 @@ function update() {
     
     // Check if sprinting
     if (BTN[4]) {
-        p.maxSpd = 4;
+        p.maxSpd = 2;
         p.deccel = .5;
     } else if (!BTN[4]) {
         p.maxSpd = 2;
@@ -78,24 +80,27 @@ function update() {
     }
     
     // If player is moving, speed up
-    if (AXIS[0]) { p.ySpd += (p.accel*AXIS[0]); }
+    if (AXIS[0]) { 
+        p.ySpd += (p.jumpSpd*AXIS[0]);
+        AXIS[0] = 0
+    }
     if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
     
     // If player isn't moving, slow down to a halt
     if (!AXIS[0]) {
-        p.ySpd -= (p.deccel * Math.sign(p.ySpd));
-        if (!p.ySpd) { p.y = Math.floor(p.y); }
+        p.ySpd += grav
     }
     if (!AXIS[1]) {
         p.xSpd -= (p.deccel * Math.sign(p.xSpd));
         if (!p.xSpd) { p.x =  Math.floor(p.x); }
     }
+
     
     // NON-FUNCTIONAL, checks for collision with level
     if (Math.sign(p.ySpd) == 1) {
         let cx = Math.floor(p.x / LEVEL.gridCellsX);
-        let cy = Math.floor(p.y / LEVEL.gridCellsY);
-        if (p.y + p.ySpd == LEVEL.data[cx + (cy * 10)]) {  }
+        let cy = Math.floor(p.y + p.ySpd / LEVEL.gridCellsY);
+        if (tilesets[0][LEVEL.data[cx + (cy * 10)]] == 1) { console.log("touched ground"); }
     }
 
     // LIMIT SPEED
@@ -159,6 +164,8 @@ function changeKey(key, state) {
     if (k == "shift") { BTN[4] = s; }
     if (k == "tab") { BTN[5] = s; }
     if (k == "e") { BTN[6] = s; }
+
+
     
     // Set axis
     if (BTN[0] && !BTN[1]) {
