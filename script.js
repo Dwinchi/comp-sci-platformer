@@ -17,8 +17,9 @@ let LEVEL = level.default.layers[0];
 
 let tilesets = [
     {
-        "x": 4,
-        "y": 3
+        x: 4,
+        y: 3,
+        tiles: [1,1,1,1,1,1,1,0,1,1,1,0]
     }
 ];
 
@@ -63,8 +64,11 @@ function startTimer() {
 function update() {
     tick();
     
-    // Player movement
-    // Set sprint
+    /* -------------------------------------------------------------------------- */
+    /*                               Player movement                              */
+    /* -------------------------------------------------------------------------- */
+    
+    // Check if sprinting
     if (BTN[4]) {
         p.maxSpd = 4;
         p.deccel = .5;
@@ -73,12 +77,11 @@ function update() {
         p.deccel = .25;
     }
     
-    // PHYSICS
+    // If player is moving, speed up
     if (AXIS[0]) { p.ySpd += (p.accel*AXIS[0]); }
     if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
-
     
-    // PHYSICS
+    // If player isn't moving, slow down to a halt
     if (!AXIS[0]) {
         p.ySpd -= (p.deccel * Math.sign(p.ySpd));
         if (!p.ySpd) { p.y = Math.floor(p.y); }
@@ -88,6 +91,7 @@ function update() {
         if (!p.xSpd) { p.x =  Math.floor(p.x); }
     }
     
+    // NON-FUNCTIONAL, checks for collision with level
     if (Math.sign(p.ySpd) == 1) {
         let cx = Math.floor(p.x / LEVEL.gridCellsX);
         let cy = Math.floor(p.y / LEVEL.gridCellsY);
