@@ -8,3 +8,7 @@ body {
     background: #111;
     margin:0
 }
+
+#ui-layer { z-index: 3; }
+#entity-layer { z-index: 2; }
+#screen-layer { z-index: 1; }
