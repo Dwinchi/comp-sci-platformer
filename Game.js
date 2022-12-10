@@ -1,6 +1,6 @@
 console.clear();
 
-import * as level from "./Game/levels/L-0.json" assert { type: "json" };
+import * as level from "./levels/L-0.json" assert { type: "json" };
 
 // Initialize variables
 /* 

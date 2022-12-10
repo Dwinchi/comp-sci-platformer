@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="script.js" type="module" defer></script>
+    <link rel="stylesheet" href="styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <section id="preload" style="display: none;">
+        <img id="player-img" src="sprites/player.png">
+        <img id="T-0" src="sprites/tilesets/t-0.png">
+    </section>
+    <section id="content">
+        <canvas class="game-layers" id="ui-layer" width="320" height="180"></canvas>
+        <canvas class="game-layers" id="entity-layer" width="320" height="180"></canvas>
+        <canvas class="game-layers" id="screen-layer" width="320" height="180"></canvas>
+
+        <span id="fps" style="color: white;z-index: 10;position: absolute;">--</span>
+    </section>
+</body>
+</html>
