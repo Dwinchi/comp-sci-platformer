@@ -1,6 +1,6 @@
 console.clear();
 
-import * as level from "./levels/L-0.json" assert { type: "json" };
+import * as level from "./Game/levels/L-0.json" assert { type: "json" };
 
 // Initialize variables
 /* 
@@ -11,22 +11,48 @@ import * as level from "./levels/L-0.json" assert { type: "json" };
 4 = shift
 5 = tab
 6 = e
+7 = space
 */
 
 let LEVEL = level.default.layers[0];
 
-let tilesets = [
+let BOXES = [
     {
-        x: 4,
-        y: 3,
-        tiles: [1,1,1,1,1,1,1,0,1,1,1,0]
-    }
-];
+        x: 0,
+        y: 144,
+        w: 320,
+        h: 40
+    },
+    {
+        x: 64,
+        y: 112,
+        w: 8,
+        h: 8
+    },
+    {
+        x: 88,
+        y: 96,
+        w: 40,
+        h: 16
+    },
+    {
+        x: 136,
+        y: 112,
+        w: 8,
+        h: 8
+    },
+]
 
-let BTN = [0,0,0,0,0,0,0];
+let tilesets = {
+    x: 4,
+    y: 3,
+    tiles: [1,1,1,1,1,1,1,0,1,1,1,0]
+};
+
+let BTN = [0,0,0,0,0,0,0,0];
 let AXIS = [0,0];
 let TIMER;
-let grav = 0.5;
+let grav = 0.2;
 
 var fps = document.getElementById("fps");
 var startTime = Date.now();
@@ -41,13 +67,14 @@ let p = {
     accel:0.5,
     deccel:0.25,
     maxSpd:2,
-    jumpSpd:6,
+    jumpSpd:-4,
     xSpd:0,
     ySpd:0,
     physAtk:10,
     elemAtk:10,
     physDef:10,
     elemDef:10,
+    isOnGround: false
 }
 
 const cUI = document.getElementById("ui-layer");
@@ -80,41 +107,85 @@ function update() {
     }
     
     // If player is moving, speed up
-    if (AXIS[0]) { 
-        p.ySpd += (p.jumpSpd*AXIS[0]);
-        AXIS[0] = 0
-    }
     if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
-    
+
+    // INPUT
+    if (BTN[7] && p.isOnGround) { p.ySpd = p.jumpSpd; }
+    // GRAVITY
+    p.ySpd += grav;
+
     // If player isn't moving, slow down to a halt
-    if (!AXIS[0]) {
-        p.ySpd += grav
-    }
     if (!AXIS[1]) {
         p.xSpd -= (p.deccel * Math.sign(p.xSpd));
         if (!p.xSpd) { p.x =  Math.floor(p.x); }
     }
 
+    BetterCheckCollision();
     
-    // NON-FUNCTIONAL, checks for collision with level
-    if (Math.sign(p.ySpd) == 1) {
-        let cx = Math.floor(p.x / LEVEL.gridCellsX);
-        let cy = Math.floor(p.y + p.ySpd / LEVEL.gridCellsY);
-        if (tilesets[0][LEVEL.data[cx + (cy * 10)]] == 1) { console.log("touched ground"); }
-    }
-
     // LIMIT SPEED
     p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
-    p.ySpd = clamp(p.ySpd,-p.maxSpd,p.maxSpd);
+    p.ySpd = clamp(p.ySpd,-8,8);
+
+    console.log(p.ySpd);
     
     p.x += p.xSpd;
     p.y += p.ySpd;
     
     draw();
+
+    function CheckCollision() {
+        // NON-FUNCTIONAL, checks for collision with level
+        let cx = Math.floor(p.x / 8);
+        let cy = Math.floor(p.y / 8);
+
+        if (!p.isOnGround && tilesets.tiles[LEVEL.data[cx + ((cy+1) * LEVEL.gridCellsX)]] == 1) {
+            p.ySpd = 0;
+            p.y = Math.floor(p.y / 8) * 8;
+            p.isOnGround = true;
+        } else if (p.isOnGround && tilesets.tiles[LEVEL.data[cx + ((cy+1) * LEVEL.gridCellsX)]] == 0) { p.isOnGround = false; }
+
+        if (!p.isOnGround && tilesets.tiles[LEVEL.data[(cx+1) + ((cy+1) * LEVEL.gridCellsX)]] == 1) {
+            p.ySpd = 0;
+            p.y = Math.floor(p.y / 8) * 8;
+            p.isOnGround = true;
+        } else if (p.isOnGround && tilesets.tiles[LEVEL.data[(cx+1) + ((cy+1) * LEVEL.gridCellsX)]] == 0) { p.isOnGround = false; }
+
+        console.log(p.isOnGround);
+    }
+
+    function BetterCheckCollision() {
+        // Improving collisions detection
+
+        for (const b of BOXES) {
+            /* if (p.x + p.w >= b.x &&
+                p.x <= b.x + b.w &&
+                p.y + p.h >= b.y &&
+                p.y <= b.y + b.h
+            ) {
+                return true
+            } */
+            if (p.x + p.w >= b.x &&
+                p.x <= b.x + b.w
+            ) {
+                if (Math.sign(p.ySpd) == 1) {
+                    p.y = b.y - p.h
+                } /* else if (Math.sign(p.ySpd) == -1) {
+                    p.y = b.y
+                } */
+                p.ySpd = 0;
+            }
+        }
+    }
 }
 
 function draw() {
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
+    
+    ctxEntity.beginPath();
+    ctxEntity.rect(Math.floor(p.x), Math.floor(p.y), 8, 8);
+    ctxEntity.fillStyle = "red";
+    ctxEntity.fill();
+    
     ctxEntity.drawImage(p.img,Math.floor(p.x),Math.floor(p.y));
     
     renderMap(level.default.layers[0]);
@@ -164,8 +235,7 @@ function changeKey(key, state) {
     if (k == "shift") { BTN[4] = s; }
     if (k == "tab") { BTN[5] = s; }
     if (k == "e") { BTN[6] = s; }
-
-
+    if (k == " ") { BTN[7] = s; }
     
     // Set axis
     if (BTN[0] && !BTN[1]) {

@@ -1,0 +1,39 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'projects/vercel.png' %}" />
+    <link rel="stylesheet" href="{% static 'projects/globals.css' %}">
+    <script src="{% static 'projects/theme.js' %}" async></script>
+
+    <meta name="description" content="This is my personal website, which includes some cool projects!">
+    <meta name="theme-color" content="#000"/>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <!-- <section id="header">
+            <span id="title">{% block title %}{% endblock %}</span>
+            <span class="headerBtn" id="theme">
+                <img class="theme-btn" src="{% static 'projects/Palette.svg' %}" width="1rem">
+                <img class="theme-btn" src="{% static 'projects/Caret Down.svg' %}">
+                <span id="theme-dropdown">
+                    <span class="preview card dark" id="dark">Dark</span>
+                    <span class="preview card light" id="light">Light</span>
+                    <span class="preview card twilight" id="twilight">Twilight</span>
+                </span>
+            </span>
+            
+            <a href="/" class="headerBtn">
+                <span>Home</span>
+            </a>
+        </section> -->
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
