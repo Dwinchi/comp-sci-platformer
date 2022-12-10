@@ -1,6 +1,7 @@
 console.clear();
 
-import * as level from "./levels/L-0.json" assert { type: "json" };
+import * as level from "./levels/L-0b.json" assert { type: "json" };
+let LAYER = level.default.layers;
 
 // Initialize variables
 /* 
@@ -43,7 +44,8 @@ let BOXES = [
     },
 ]
 
-let tilesets = {
+// TS means Tilesets
+let TS = {
     x: 4,
     y: 3,
     tiles: [1,1,1,1,1,1,1,0,1,1,1,0]
@@ -120,13 +122,11 @@ function update() {
         if (!p.xSpd) { p.x =  Math.floor(p.x); }
     }
 
-    BetterCheckCollision();
+    CheckCollision();
     
     // LIMIT SPEED
     p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
     p.ySpd = clamp(p.ySpd,-8,8);
-
-    console.log(p.ySpd);
     
     p.x += p.xSpd;
     p.y += p.ySpd;
@@ -134,6 +134,21 @@ function update() {
     draw();
 
     function CheckCollision() {
+        // NON-FUNCTIONAL, checks for collision with level
+        let cx = Math.floor(p.x / 8);
+        let cy = Math.floor((p.y + p.ySpd) / 8);
+
+        
+        if (TS.tiles[LAYER[1].data[cx + ((cy+1) * LAYER[1].gridCellsX)]] == 1) {
+            p.ySpd = 0;
+            p.y = cy * 8;
+            p.isOnGround = true;
+        } else if (TS.tiles[LAYER[1].data[cx + ((cy+1) * LAYER[1].gridCellsX)]] == 0) { p.isOnGround = false; }
+        
+        console.log(TS.tiles[LAYER[1].data[cx + ((cy+1) * LAYER[1].gridCellsX)]], p.isOnGround);
+    }
+
+    function OGCheckCollision() {
         // NON-FUNCTIONAL, checks for collision with level
         let cx = Math.floor(p.x / 8);
         let cy = Math.floor(p.y / 8);
@@ -164,9 +179,13 @@ function update() {
             ) {
                 return true
             } */
+            console.log(p.y, b.y);
             if (p.x + p.w >= b.x &&
-                p.x <= b.x + b.w
+                p.x <= b.x + b.w &&
+                p.y + p.h >= b.y &&
+                p.y <= b.y + b.h
             ) {
+                console.log("in");
                 if (Math.sign(p.ySpd) == 1) {
                     p.y = b.y - p.h
                 } /* else if (Math.sign(p.ySpd) == -1) {
