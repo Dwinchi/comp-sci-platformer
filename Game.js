@@ -64,6 +64,8 @@ var frame = 0;
 let p = {
     x:0,
     y:0,
+    w:7,
+    h:7,
     img:document.getElementById("player-img"),
     sprite:0,
     accel:0.5,
@@ -99,6 +101,9 @@ function update() {
     /*                               Player movement                              */
     /* -------------------------------------------------------------------------- */
     
+
+    // !DISABLE GRAVITY TO TEST COLLISIONS
+
     // Check if sprinting
     if (BTN[4]) {
         p.maxSpd = 2;
@@ -114,7 +119,10 @@ function update() {
     // INPUT
     if (BTN[7] && p.isOnGround) { p.ySpd = p.jumpSpd; }
     // GRAVITY
-    p.ySpd += grav;
+    
+    if (!p.isOnGround) {
+        p.ySpd += grav;
+    }
 
     // If player isn't moving, slow down to a halt
     if (!AXIS[1]) {
@@ -122,95 +130,162 @@ function update() {
         if (!p.xSpd) { p.x =  Math.floor(p.x); }
     }
 
-    CheckCollision();
-    
     // LIMIT SPEED
     p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
     p.ySpd = clamp(p.ySpd,-8,8);
-    
+
+    //testing();
+
     p.x += p.xSpd;
     p.y += p.ySpd;
-    
+
+    BetterCheckCollision();
+
     draw();
 
-    function CheckCollision() {
-        // NON-FUNCTIONAL, checks for collision with level
-        let cx = Math.floor(p.x / 8);
-        let cy = Math.floor((p.y + p.ySpd) / 8);
-
-        
-        if (TS.tiles[LAYER[1].data[cx + ((cy+1) * LAYER[1].gridCellsX)]] == 1) {
-            p.ySpd = 0;
-            p.y = cy * 8;
-            p.isOnGround = true;
-        } else if (TS.tiles[LAYER[1].data[cx + ((cy+1) * LAYER[1].gridCellsX)]] == 0) { p.isOnGround = false; }
-        
-        console.log(TS.tiles[LAYER[1].data[cx + ((cy+1) * LAYER[1].gridCellsX)]], p.isOnGround);
+    function testing() {
+        // PHYSICS
+        if (AXIS[0]) { p.ySpd += (p.accel*AXIS[0]); }
+        if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
+        // PHYSICS
+        if (!AXIS[0]) {
+            p.ySpd -= (p.deccel * Math.sign(p.ySpd));
+            if (!p.ySpd) { p.y = Math.floor(p.y); }
+        }
+        if (!AXIS[1]) {
+            p.xSpd -= (p.deccel * Math.sign(p.xSpd));
+            if (!p.xSpd) { p.x =  Math.floor(p.x); }
+        }
+        // LIMIT SPEED
+        p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
+        p.ySpd = clamp(p.ySpd,-p.maxSpd,p.maxSpd);
     }
 
-    function OGCheckCollision() {
-        // NON-FUNCTIONAL, checks for collision with level
-        let cx = Math.floor(p.x / 8);
-        let cy = Math.floor(p.y / 8);
+    function BetterCheckCollision() {        
+        for (let turn = 0; turn < 2; turn++) {
+            let x1 = Math.floor(p.x / 8);
+            let x2 = Math.floor((p.x + p.w) / 8);
+            let y1 = Math.floor(p.y / 8);
+            let y2 = Math.floor((p.y + p.h) / 8);
+            
+            let l = LAYER[1];
+    
+            let t0 = TS.tiles[l.data[x1 + (y1 * l.gridCellsX)]];
+            let t1 = TS.tiles[l.data[x2 + (y1 * l.gridCellsX)]];
+            let t2 = TS.tiles[l.data[x1 + (y2 * l.gridCellsX)]];
+            let t3 = TS.tiles[l.data[x2 + (y2 * l.gridCellsX)]];
 
-        if (!p.isOnGround && tilesets.tiles[LEVEL.data[cx + ((cy+1) * LEVEL.gridCellsX)]] == 1) {
-            p.ySpd = 0;
-            p.y = Math.floor(p.y / 8) * 8;
-            p.isOnGround = true;
-        } else if (p.isOnGround && tilesets.tiles[LEVEL.data[cx + ((cy+1) * LEVEL.gridCellsX)]] == 0) { p.isOnGround = false; }
-
-        if (!p.isOnGround && tilesets.tiles[LEVEL.data[(cx+1) + ((cy+1) * LEVEL.gridCellsX)]] == 1) {
-            p.ySpd = 0;
-            p.y = Math.floor(p.y / 8) * 8;
-            p.isOnGround = true;
-        } else if (p.isOnGround && tilesets.tiles[LEVEL.data[(cx+1) + ((cy+1) * LEVEL.gridCellsX)]] == 0) { p.isOnGround = false; }
-
-        console.log(p.isOnGround);
-    }
-
-    function BetterCheckCollision() {
-        // Improving collisions detection
-
-        for (const b of BOXES) {
-            /* if (p.x + p.w >= b.x &&
-                p.x <= b.x + b.w &&
-                p.y + p.h >= b.y &&
-                p.y <= b.y + b.h
-            ) {
-                return true
-            } */
-            console.log(p.y, b.y);
-            if (p.x + p.w >= b.x &&
-                p.x <= b.x + b.w &&
-                p.y + p.h >= b.y &&
-                p.y <= b.y + b.h
-            ) {
-                console.log("in");
-                if (Math.sign(p.ySpd) == 1) {
-                    p.y = b.y - p.h
-                } /* else if (Math.sign(p.ySpd) == -1) {
-                    p.y = b.y
-                } */
-                p.ySpd = 0;
+            // Horizontal
+            if (p.xSpd != 0 && turn == 0) {
+                if (
+                    t1 == 1 ||
+                    t3 == 1
+                    ) {
+                    p.xSpd = 0;
+                    p.x = x1 * 8;
+                } else if (
+                    t0 == 1 ||
+                    t2 == 1
+                    ) {
+                    p.xSpd = 0;
+                    p.x = x2 * 8;
+                }
+            }
+    
+            // Vertical
+            if (p.ySpd != 0 && turn == 1) {
+                if (
+                    t1 == 1 ||
+                    t0 == 1
+                    ) {
+                    p.ySpd = 0;
+                    p.y = (y2) * 8;
+                } else if (
+                    t2 == 1 ||
+                    t3 == 1
+                    ) {
+                    p.ySpd = 0;
+                    p.y = y1 * 8;
+                    p.isOnGround = true;
+                } else if (
+                    t2 != 1 ||
+                    t3 != 1
+                ) { p.isOnGround = false; }
             }
         }
     }
+
+    function CheckCollision() {
+        // Working a bit?
+        let cx = Math.floor((p.x + p.xSpd) / 8);
+        let cy = Math.floor((p.y + p.ySpd) / 8);
+
+        ctxEntity.beginPath();
+        ctxEntity.rect(cx * 8, cy * 8, 8, 8);
+        ctxEntity.fillStyle = "red";
+        ctxEntity.fill();
+
+        let l = LAYER[1];
+        
+        // Horizontal
+        if (
+/*             TS.tiles[l.data[cx + (cy * l.gridCellsX)]] == 1 ||
+ */            TS.tiles[l.data[(cx+1) + (cy * l.gridCellsX)]] == 1
+            ) {
+            console.log("horizontal collision");
+            p.xSpd = 0;
+            /* p.x = (cx+1) * 8; */
+            p.x = (cx) * 8;
+        }
+        if (
+            TS.tiles[l.data[(cx+1) + ((cy+1) * l.gridCellsX)]] == 1 ||
+            TS.tiles[l.data[cx + ((cy+1) * l.gridCellsX)]] == 1
+            ) {
+            p.ySpd = 0;
+            p.y = cy * 8;
+            p.isOnGround = true;
+        } else if (
+            TS.tiles[l.data[(cx+1) + ((cy+1) * l.gridCellsX)]] != 1 ||
+            TS.tiles[l.data[cx + ((cy+1) * l.gridCellsX)]] != 1
+        ) { p.isOnGround = false; }
+    }
+
 }
 
 function draw() {
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
-    
+
+    let x1 = Math.floor(p.x / 8);
+    let x2 = Math.floor((p.x + p.w) / 8);
+    let y1 = Math.floor(p.y / 8);
+    let y2 = Math.floor((p.y + p.h) / 8);
+
     ctxEntity.beginPath();
-    ctxEntity.rect(Math.floor(p.x), Math.floor(p.y), 8, 8);
-    ctxEntity.fillStyle = "red";
+    ctxEntity.rect(x1 * 8, y1 * 8, 4, 4);
+    ctxEntity.fillStyle = "#c06852";
+    ctxEntity.fill();
+
+    ctxEntity.beginPath();
+    ctxEntity.rect(x2 * 8 + 4, y1 * 8, 4, 4);
+    ctxEntity.fillStyle = "#5a78b2";
+    ctxEntity.fill();
+
+    ctxEntity.beginPath();
+    ctxEntity.rect(x1 * 8, y2 * 8 + 4, 4, 4);
+    ctxEntity.fillStyle = "#6ec077";
     ctxEntity.fill();
     
+    ctxEntity.beginPath();
+    ctxEntity.rect(x2 * 8 + 4, y2 * 8 + 4, 4, 4);
+    ctxEntity.fillStyle = "#f5c47c";
+    ctxEntity.fill();
+
     ctxEntity.drawImage(p.img,Math.floor(p.x),Math.floor(p.y));
     
-    renderMap(level.default.layers[0]);
+    renderMap();
 }
 
-function renderMap(m) {
+function renderMap() {
     /* 
     offsets for moving maps
     ox = offset x
@@ -224,19 +299,22 @@ function renderMap(m) {
 
 	let cx = 0;
     let cy = 0;
-    let ts = m.tileset;
-
-    for (let ct = 0; ct < (m.gridCellsX * m.gridCellsY);  ct++) {
-        let tg = parseInt(m.data[ct]);
-
-        let oy = Math.floor(tg / 4);
-        let ox = tg - (oy * 4);
-
-        let img = document.getElementById(m.tileset);
-        ctxScreen.drawImage(img,ox*8,oy*8,8,8,(cx * 8),(cy * 8),8,8);
-
-        cx++;
-        if (cx/m.gridCellsX == 1) { cy++; cx = 0; }
+    //let ts = l.tileset;
+    
+    for (let l of LAYER) {
+        for (let ct = 0; ct < (l.gridCellsX * l.gridCellsY);  ct++) {
+            // Change LAYER[1] to l once done
+            let tg = parseInt(LAYER[1].data[ct]);
+    
+            let oy = Math.floor(tg / 4);
+            let ox = tg - (oy * 4);
+    
+            let img = document.getElementById(l.tileset);
+            ctxScreen.drawImage(img,ox*8,oy*8,8,8,(cx * 8),(cy * 8),8,8);
+    
+            cx++;
+            if (cx/l.gridCellsX == 1) { cy++; cx = 0; }
+        }
     }
 }
 

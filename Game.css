@@ -1,3 +1,8 @@
+body {
+    margin: 0;
+    background: #222
+}
+
 .game-layers {
     position: absolute;
     image-rendering: pixelated;

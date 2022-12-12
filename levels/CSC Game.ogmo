@@ -19,9 +19,18 @@
   "layers": [
     {
       "definition": "tile",
-      "name": "Level",
+      "name": "BG",
       "gridSize": {"x": 8, "y": 8},
       "exportID": "44121636",
+      "exportMode": 0,
+      "arrayMode": 0,
+      "defaultTileset": "T-0"
+    },
+    {
+      "definition": "tile",
+      "name": "Obj",
+      "gridSize": {"x": 8, "y": 8},
+      "exportID": "77539480",
       "exportMode": 0,
       "arrayMode": 0,
       "defaultTileset": "T-0"
