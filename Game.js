@@ -17,6 +17,8 @@ let LAYER = level.default.layers;
 
 let LEVEL = level.default.layers[0];
 
+
+
 let BOXES = [
     {
         x: 0,
@@ -74,10 +76,6 @@ let p = {
     jumpSpd:-4,
     xSpd:0,
     ySpd:0,
-    physAtk:10,
-    elemAtk:10,
-    physDef:10,
-    elemDef:10,
     isOnGround: false
 }
 
@@ -101,45 +99,35 @@ function update() {
     /*                               Player movement                              */
     /* -------------------------------------------------------------------------- */
     
-
-    // !DISABLE GRAVITY TO TEST COLLISIONS
-
-    // Check if sprinting
-    if (BTN[4]) {
-        p.maxSpd = 2;
-        p.deccel = .5;
-    } else if (!BTN[4]) {
-        p.maxSpd = 2;
-        p.deccel = .25;
-    }
-    
-    // If player is moving, speed up
+    /* // If player is moving, speed up
     if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
 
-    // INPUT
+    // Jump
     if (BTN[7] && p.isOnGround) { p.ySpd = p.jumpSpd; }
+
     // GRAVITY
-    
     if (!p.isOnGround) {
         p.ySpd += grav;
     }
-
+    
     // If player isn't moving, slow down to a halt
     if (!AXIS[1]) {
         p.xSpd -= (p.deccel * Math.sign(p.xSpd));
         if (!p.xSpd) { p.x =  Math.floor(p.x); }
     }
-
+    
     // LIMIT SPEED
     p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
-    p.ySpd = clamp(p.ySpd,-8,8);
-
-    //testing();
-
+    p.ySpd = clamp(p.ySpd,-8,8); */
+    
+    testing();
+    
     p.x += p.xSpd;
     p.y += p.ySpd;
-
-    BetterCheckCollision();
+    
+    BetterCollision();
+    
+    console.log(p.ySpd);
 
     draw();
 
@@ -161,96 +149,203 @@ function update() {
         p.ySpd = clamp(p.ySpd,-p.maxSpd,p.maxSpd);
     }
 
-    function BetterCheckCollision() {        
-        for (let turn = 0; turn < 2; turn++) {
-            let x1 = Math.floor(p.x / 8);
-            let x2 = Math.floor((p.x + p.w) / 8);
-            let y1 = Math.floor(p.y / 8);
-            let y2 = Math.floor((p.y + p.h) / 8);
-            
-            let l = LAYER[1];
-    
-            let t0 = TS.tiles[l.data[x1 + (y1 * l.gridCellsX)]];
-            let t1 = TS.tiles[l.data[x2 + (y1 * l.gridCellsX)]];
-            let t2 = TS.tiles[l.data[x1 + (y2 * l.gridCellsX)]];
-            let t3 = TS.tiles[l.data[x2 + (y2 * l.gridCellsX)]];
+    function CheckCollision() {
+        let l = LAYER[1];
 
-            // Horizontal
-            if (p.xSpd != 0 && turn == 0) {
-                if (
-                    t1 == 1 ||
-                    t3 == 1
-                    ) {
-                    p.xSpd = 0;
-                    p.x = x1 * 8;
-                } else if (
-                    t0 == 1 ||
-                    t2 == 1
-                    ) {
-                    p.xSpd = 0;
-                    p.x = x2 * 8;
-                }
-            }
-    
-            // Vertical
-            if (p.ySpd != 0 && turn == 1) {
-                if (
-                    t1 == 1 ||
-                    t0 == 1
-                    ) {
-                    p.ySpd = 0;
-                    p.y = (y2) * 8;
-                } else if (
-                    t2 == 1 ||
-                    t3 == 1
-                    ) {
-                    p.ySpd = 0;
-                    p.y = y1 * 8;
-                    p.isOnGround = true;
-                } else if (
-                    t2 != 1 ||
-                    t3 != 1
-                ) { p.isOnGround = false; }
+        let x1;
+        let x2;
+        let y1;
+        let y2;
+        
+        let t0;
+        let t1;
+        let t2;
+        let t3;
+        
+        CheckTiles();
+        
+        // Vertical
+        if (p.ySpd != 0) {
+            if (
+                t1 == 1 ||
+                t0 == 1
+                ) {
+                p.ySpd = 0;
+                p.y = (y2) * 8;
+            } else if (
+                TS.tiles[l.data[x1 + ((y2+1) * l.gridCellsX)]] != 1 || 
+                TS.tiles[l.data[x1 + ((y2+1) * l.gridCellsX)]] != 1
+                ) {
+                p.isOnGround = false;
+            } else if (
+                t2 == 1 ||
+                t3 == 1
+                ) {
+                p.ySpd = 0;
+                p.y = y1 * 8;
+                p.isOnGround = true;
             }
         }
-    }
-
-    function CheckCollision() {
-        // Working a bit?
-        let cx = Math.floor((p.x + p.xSpd) / 8);
-        let cy = Math.floor((p.y + p.ySpd) / 8);
-
-        ctxEntity.beginPath();
-        ctxEntity.rect(cx * 8, cy * 8, 8, 8);
-        ctxEntity.fillStyle = "red";
-        ctxEntity.fill();
-
-        let l = LAYER[1];
         
         // Horizontal
-        if (
-/*             TS.tiles[l.data[cx + (cy * l.gridCellsX)]] == 1 ||
- */            TS.tiles[l.data[(cx+1) + (cy * l.gridCellsX)]] == 1
-            ) {
-            console.log("horizontal collision");
-            p.xSpd = 0;
-            /* p.x = (cx+1) * 8; */
-            p.x = (cx) * 8;
+        if (p.xSpd != 0) {
+            if (
+                t1 == 1 ||
+                t3 == 1
+                ) {
+                p.xSpd = 0;
+                p.x = x1 * 8;
+            } else if (
+                t0 == 1 ||
+                t2 == 1
+                ) {
+                p.xSpd = 0;
+                p.x = x2 * 8;
+            }
         }
-        if (
-            TS.tiles[l.data[(cx+1) + ((cy+1) * l.gridCellsX)]] == 1 ||
-            TS.tiles[l.data[cx + ((cy+1) * l.gridCellsX)]] == 1
-            ) {
-            p.ySpd = 0;
-            p.y = cy * 8;
-            p.isOnGround = true;
-        } else if (
-            TS.tiles[l.data[(cx+1) + ((cy+1) * l.gridCellsX)]] != 1 ||
-            TS.tiles[l.data[cx + ((cy+1) * l.gridCellsX)]] != 1
-        ) { p.isOnGround = false; }
+
+        function CheckTiles() {
+            x1 = Math.floor(p.x / 8);
+            x2 = Math.floor((p.x + p.w) / 8);
+            y1 = Math.floor(p.y / 8);
+            y2 = Math.floor((p.y + p.h) / 8);
+            
+            t0 = TS.tiles[l.data[x1 + (y1 * l.gridCellsX)]];
+            t1 = TS.tiles[l.data[x2 + (y1 * l.gridCellsX)]];
+            t2 = TS.tiles[l.data[x1 + (y2 * l.gridCellsX)]];
+            t3 = TS.tiles[l.data[x2 + (y2 * l.gridCellsX)]];
+
+            if ((t0 == 1 || t1 == 1)) {  }
+        }
     }
 
+    function BetterCollision() {
+        let l = LAYER[1];
+
+        touching()
+
+        function touching(x, y, obj, dir) {
+            let t0;
+            let t1;
+            let t2;
+            let t3;
+
+            if (dir == "hor") {
+                let x1 = Math.floor((p.x + p.xSpd) / 8);
+                let x2 = Math.floor((p.x + p.w + p.xSpd) / 8);
+                let y1 = Math.floor(p.y / 8);
+                let y2 = Math.floor((p.y + p.h) / 8);
+
+                t0 = TS.tiles[l.data[x1 + (y1 * l.gridCellsX)]];
+                t1 = TS.tiles[l.data[x2 + (y1 * l.gridCellsX)]];
+                t2 = TS.tiles[l.data[x1 + (y2 * l.gridCellsX)]];
+                t3 = TS.tiles[l.data[x2 + (y2 * l.gridCellsX)]];
+            } else if (dir == "hor") {
+                let x1 = Math.floor(p.x / 8);
+                let x2 = Math.floor((p.x + p.w) / 8);
+                let y1 = Math.floor((p.y + p.ySpd) / 8);
+                let y2 = Math.floor((p.y + p.h + p.ySpd) / 8);
+
+                t0 = TS.tiles[l.data[x1 + (y1 * l.gridCellsX)]];
+                t1 = TS.tiles[l.data[x2 + (y1 * l.gridCellsX)]];
+                t2 = TS.tiles[l.data[x1 + (y2 * l.gridCellsX)]];
+                t3 = TS.tiles[l.data[x2 + (y2 * l.gridCellsX)]];
+            }
+
+            // Vertical
+            if (t1 == 1 || t0 == 1) {
+                return true;
+            } else if (t2 == 1 || t3 == 1) {
+                return true;
+            }
+            
+            // Horizontal
+            if (t1 == 1 || t3 == 1) {
+                return true;
+            } else if (t0 == 1 || t2 == 1) {
+                return true;
+            }
+        }
+    }
 }
+
+/*
+
+*/
+
+
+/* function movearrows() {
+    for (let arrow of player.arrows) {
+        // Shoot arrow
+        if (!arrow && BTN[6]) {
+            player.arrows[player.arrows.indexOf(arrow)] = {
+                x: player.x + 15,
+                y: player.y + 15,
+                dir: player.dir
+            };
+            
+            BTN[6] = 0;
+        }
+
+        // Move arrows
+        if (arrow) {
+            let x = arrow.x;
+            let y = arrow.y;
+            let dir = arrow.dir;
+            let spd = 6;
+
+            if (dir == 0) {
+                y -= spd;
+            } else if (dir == 4) {
+                y += spd;
+            } else if (dir == 2) {
+                x += spd;
+            } else if (dir == 6) {
+                x -= spd;
+            } else if (dir == 1) {
+                x += (spd / 2);
+                y -= (spd / 2);
+            } else if (dir == 5) {
+                x -= (spd / 2);
+                y += (spd / 2);
+            } else if (dir == 3) {
+                x += (spd / 2);
+                y += (spd / 2);
+            } else if (dir == 7) {
+                x -= (spd / 2);
+                y -= (spd / 2);
+            }
+            
+            // Set movement and angle
+            let b = document.getElementById(`shot${player.arrows.indexOf(arrow)}`).style;
+            b.left = `${x}px`;
+            b.top = `${y}px`;
+            
+            arrow.x = x;
+            arrow.y = y;
+            
+            // Checking if arrow is out of the screen
+            if (arrow.x > window.innerWidth || arrow.y > window.innerHeight || arrow.x < 0 || arrow.y < 0) {
+                player.arrows[player.arrows.indexOf(arrow)] = 0;
+                b.left = `${-50}px`;
+                b.top = `${-50}px`;
+            }
+
+            if ((player.x < arrow.x + 50) && (player.x + 50 < arrow.x) && (player.y < arrow.y + 50) && (player.y + 50 > arrow.y)) {}
+
+            // Checking if arrow hit enemy and removing it
+            if ((bad.x < arrow.x + 50) && (bad.x + 50 < arrow.x) && (bad.y < arrow.y + 50) && (bad.y + 50 > arrow.y)) {
+                bad.x = 800;
+                bad.y = 200;
+                b.left = `${-50}px`;
+                b.top = `${-50}px`;
+                player.arrows[player.arrows.indexOf(arrow)] = 0;
+            }
+        
+        }
+    }
+}
+*/
 
 function draw() {
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
