@@ -17,13 +17,14 @@ const healthBar = new HealthBar(x, y, healthBarWidth, healthBarHeight, maxHealth
 // Updates frames
 const frame = function() {
   ctxUI.clearRect(0, 0, width, height);
+  let baseLayer = new Image();
+  baseLayer.src = 'images/baseLayer.png';
+  ctxUI.drawImage(baseLayer, 45, 4, 75, 15);
   healthBar.show(ctxUI);
   let border = new Image();
-  border.classList.add('images');
   border.src = 'images/border.png';
   ctxUI.drawImage(border, 45, 4, 75, 15);
   let heart = new Image();
-  heart.classList.add('images');
   heart.src = 'images/heart.png';
   ctxUI.drawImage(heart, 45, 4, 75, 15);
   requestAnimationFrame(frame);
