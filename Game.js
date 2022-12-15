@@ -13,11 +13,10 @@ let LAYER = level.default.layers;
 5 = tab
 6 = e
 7 = space
+8 = j
 */
 
 let LEVEL = level.default.layers[0];
-
-
 
 let BOXES = [
     {
@@ -69,14 +68,16 @@ let p = {
     w:7,
     h:7,
     img:document.getElementById("player-img"),
-    sprite:0,
+    st:1,
+    s:0,
+    si:0,
     accel:0.5,
     deccel:0.25,
     maxSpd:2,
     jumpSpd:-4,
     xSpd:0,
     ySpd:0,
-    isOnGround: false
+    canJump: false
 }
 
 const cUI = document.getElementById("ui-layer");
@@ -99,16 +100,18 @@ function update() {
     /*                               Player movement                              */
     /* -------------------------------------------------------------------------- */
     
-    /* // If player is moving, speed up
+    // If player is moving, speed up
     if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
 
     // Jump
-    if (BTN[7] && p.isOnGround) { p.ySpd = p.jumpSpd; }
+    if (BTN[7] && p.canJump) {
+        p.ySpd = p.jumpSpd;
+        p.canJump = 0;
+        BTN[7] = 0;
+    }
 
     // GRAVITY
-    if (!p.isOnGround) {
-        p.ySpd += grav;
-    }
+    p.ySpd += grav;
     
     // If player isn't moving, slow down to a halt
     if (!AXIS[1]) {
@@ -118,161 +121,86 @@ function update() {
     
     // LIMIT SPEED
     p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
-    p.ySpd = clamp(p.ySpd,-8,8); */
+    p.ySpd = clamp(p.ySpd,-8,8);
     
-    testing();
+    // Horizontal collision
+    if (touching(p.x + p.xSpd, p.y, "x")) {
+        while (!touching(p.x+Math.sign(p.xSpd), p.y, "x")) {
+            p.x += Math.sign(p.xSpd);
+        }
+
+        // Wall grab
+        if (touching(p.x+Math.sign(p.xSpd), p.y, "x")) {
+            if (BTN[8] && BTN[7]) {
+                p.ySpd = -4;
+                p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
+            } else if (BTN[8] && !BTN[7]) {
+                p.ySpd = 0;
+            } else { p.ySpd = 0.1; }
+        }
+
+        p.xSpd = 0;
+    }
+    
+    // Vertical collision
+    if (touching(p.x, p.y + p.ySpd, "y")) {
+        while (!touching(p.x, p.y + Math.sign(p.ySpd), "y")) {
+            p.y += Math.sign(p.ySpd);
+        }
+        
+        if (Math.sign(p.ySpd) == 1) {
+            p.canJump = true;
+        }
+        
+        p.ySpd = 0;
+    } else { p.canJump = false; }
+
+    if (p.st == 1) {
+        // Normal running state
+        
+    } else if (p.st == 2) {
+        // Jump state
+        
+    } else if (p.st == 3) {
+        // Wall slide
+
+        if (BTN[7]) {
+            jump();
+            p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
+            console.log("jumped", (Math.sign(p.xSpd) * -1));
+        }
+    } else if (p.st == 4) {
+        // Wall grab
+        if (BTN[7]) {
+            jump();
+            p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
+            console.log("jumped", (Math.sign(p.xSpd) * -1));
+        }
+    }
     
     p.x += p.xSpd;
     p.y += p.ySpd;
     
-    BetterCollision();
-    
-    console.log(p.ySpd);
-
     draw();
 
-    function testing() {
-        // PHYSICS
-        if (AXIS[0]) { p.ySpd += (p.accel*AXIS[0]); }
-        if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
-        // PHYSICS
-        if (!AXIS[0]) {
-            p.ySpd -= (p.deccel * Math.sign(p.ySpd));
-            if (!p.ySpd) { p.y = Math.floor(p.y); }
+    function SwitchState(state, obj) {
+        obj.st = state;
+
+        switch (obj.st) {
+            case 0:
+                
+                break;
+        
+            case 1:
+                break;
         }
-        if (!AXIS[1]) {
-            p.xSpd -= (p.deccel * Math.sign(p.xSpd));
-            if (!p.xSpd) { p.x =  Math.floor(p.x); }
-        }
-        // LIMIT SPEED
-        p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
-        p.ySpd = clamp(p.ySpd,-p.maxSpd,p.maxSpd);
+        
     }
 
-    function CheckCollision() {
-        let l = LAYER[1];
-
-        let x1;
-        let x2;
-        let y1;
-        let y2;
-        
-        let t0;
-        let t1;
-        let t2;
-        let t3;
-        
-        CheckTiles();
-        
-        // Vertical
-        if (p.ySpd != 0) {
-            if (
-                t1 == 1 ||
-                t0 == 1
-                ) {
-                p.ySpd = 0;
-                p.y = (y2) * 8;
-            } else if (
-                TS.tiles[l.data[x1 + ((y2+1) * l.gridCellsX)]] != 1 || 
-                TS.tiles[l.data[x1 + ((y2+1) * l.gridCellsX)]] != 1
-                ) {
-                p.isOnGround = false;
-            } else if (
-                t2 == 1 ||
-                t3 == 1
-                ) {
-                p.ySpd = 0;
-                p.y = y1 * 8;
-                p.isOnGround = true;
-            }
-        }
-        
-        // Horizontal
-        if (p.xSpd != 0) {
-            if (
-                t1 == 1 ||
-                t3 == 1
-                ) {
-                p.xSpd = 0;
-                p.x = x1 * 8;
-            } else if (
-                t0 == 1 ||
-                t2 == 1
-                ) {
-                p.xSpd = 0;
-                p.x = x2 * 8;
-            }
-        }
-
-        function CheckTiles() {
-            x1 = Math.floor(p.x / 8);
-            x2 = Math.floor((p.x + p.w) / 8);
-            y1 = Math.floor(p.y / 8);
-            y2 = Math.floor((p.y + p.h) / 8);
-            
-            t0 = TS.tiles[l.data[x1 + (y1 * l.gridCellsX)]];
-            t1 = TS.tiles[l.data[x2 + (y1 * l.gridCellsX)]];
-            t2 = TS.tiles[l.data[x1 + (y2 * l.gridCellsX)]];
-            t3 = TS.tiles[l.data[x2 + (y2 * l.gridCellsX)]];
-
-            if ((t0 == 1 || t1 == 1)) {  }
-        }
-    }
-
-    function BetterCollision() {
-        let l = LAYER[1];
-
-        touching()
-
-        function touching(x, y, obj, dir) {
-            let t0;
-            let t1;
-            let t2;
-            let t3;
-
-            if (dir == "hor") {
-                let x1 = Math.floor((p.x + p.xSpd) / 8);
-                let x2 = Math.floor((p.x + p.w + p.xSpd) / 8);
-                let y1 = Math.floor(p.y / 8);
-                let y2 = Math.floor((p.y + p.h) / 8);
-
-                t0 = TS.tiles[l.data[x1 + (y1 * l.gridCellsX)]];
-                t1 = TS.tiles[l.data[x2 + (y1 * l.gridCellsX)]];
-                t2 = TS.tiles[l.data[x1 + (y2 * l.gridCellsX)]];
-                t3 = TS.tiles[l.data[x2 + (y2 * l.gridCellsX)]];
-            } else if (dir == "hor") {
-                let x1 = Math.floor(p.x / 8);
-                let x2 = Math.floor((p.x + p.w) / 8);
-                let y1 = Math.floor((p.y + p.ySpd) / 8);
-                let y2 = Math.floor((p.y + p.h + p.ySpd) / 8);
-
-                t0 = TS.tiles[l.data[x1 + (y1 * l.gridCellsX)]];
-                t1 = TS.tiles[l.data[x2 + (y1 * l.gridCellsX)]];
-                t2 = TS.tiles[l.data[x1 + (y2 * l.gridCellsX)]];
-                t3 = TS.tiles[l.data[x2 + (y2 * l.gridCellsX)]];
-            }
-
-            // Vertical
-            if (t1 == 1 || t0 == 1) {
-                return true;
-            } else if (t2 == 1 || t3 == 1) {
-                return true;
-            }
-            
-            // Horizontal
-            if (t1 == 1 || t3 == 1) {
-                return true;
-            } else if (t0 == 1 || t2 == 1) {
-                return true;
-            }
-        }
+    function jump() {
+        p.ySpd = p.jumpSpd;
     }
 }
-
-/*
-
-*/
-
 
 /* function movearrows() {
     for (let arrow of player.arrows) {
@@ -350,7 +278,7 @@ function update() {
 function draw() {
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
 
-    let x1 = Math.floor(p.x / 8);
+    /* let x1 = Math.floor(p.x / 8);
     let x2 = Math.floor((p.x + p.w) / 8);
     let y1 = Math.floor(p.y / 8);
     let y2 = Math.floor((p.y + p.h) / 8);
@@ -373,7 +301,7 @@ function draw() {
     ctxEntity.beginPath();
     ctxEntity.rect(x2 * 8 + 4, y2 * 8 + 4, 4, 4);
     ctxEntity.fillStyle = "#f5c47c";
-    ctxEntity.fill();
+    ctxEntity.fill(); */
 
     ctxEntity.drawImage(p.img,Math.floor(p.x),Math.floor(p.y));
     
@@ -428,6 +356,7 @@ function changeKey(key, state) {
     if (k == "tab") { BTN[5] = s; }
     if (k == "e") { BTN[6] = s; }
     if (k == " ") { BTN[7] = s; }
+    if (k == "j") { BTN[8] = s; }
     
     // Set axis
     if (BTN[0] && !BTN[1]) {
@@ -450,6 +379,50 @@ function changeKey(key, state) {
 document.addEventListener("keydown", function(e) { changeKey(e.key, 1) });
 document.addEventListener("keyup", function(e) { changeKey(e.key, 0) });
 window.addEventListener("resize", resize);
+
+function touching(x, y, dir) {
+    let x1;
+    let x2;
+    let y1;
+    let y2;
+    let t0;
+    let t1;
+    let t2;
+    let t3;
+    
+    let l = LAYER[1];
+
+    if (dir == "x") {
+        x1 = Math.floor((x) / 8);
+        x2 = Math.floor((x + p.w) / 8);
+        y1 = Math.floor(y / 8);
+        y2 = Math.floor((y + p.h) / 8);
+    } else if (dir == "y") {
+        x1 = Math.floor(x / 8);
+        x2 = Math.floor((x + p.w) / 8);
+        y1 = Math.floor(y / 8);
+        y2 = Math.floor((y + p.h) / 8);
+    }
+
+    t0 = TS.tiles[l.data[x1 + (y1 * l.gridCellsX)]];
+    t1 = TS.tiles[l.data[x2 + (y1 * l.gridCellsX)]];
+    t2 = TS.tiles[l.data[x1 + (y2 * l.gridCellsX)]];
+    t3 = TS.tiles[l.data[x2 + (y2 * l.gridCellsX)]];
+
+    // Vertical
+    if (t1 == 1 || t0 == 1) {
+        return true;
+    } else if (t2 == 1 || t3 == 1) {
+        return true;
+    }
+    
+    // Horizontal
+    if (t1 == 1 || t3 == 1) {
+        return true;
+    } else if (t0 == 1 || t2 == 1) {
+        return true;
+    }
+}
 
 function resize() {
     let winWidth = Math.floor(window.innerHeight / 180);
