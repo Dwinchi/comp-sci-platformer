@@ -1,0 +1,14 @@
+
+#background{
+    position: absolute;
+    margin: 0;
+    padding: 0;
+}
+
+#ui-layer{
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    image-rendering: pixelated;
+}
+
