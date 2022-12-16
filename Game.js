@@ -82,6 +82,7 @@ let p = {
     canJump: false,
     isOnWall: false,
     arrows: [0,0,0],
+    canFire: false,
 }
 
 const cUI = document.getElementById("ui-layer");
@@ -125,6 +126,16 @@ function update() {
 
     if (p.xSpd > 0) { p.sr = 0; }
     else if (p.xSpd < 0) { p.sr = 1; }
+
+    // If player has bow
+    if (bowPwr) {
+        canFire = true;
+    }
+
+    // Firing bow 
+    if (canFire) {
+        movearrows()
+    }
     
     // LIMIT SPEED
     p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
@@ -201,7 +212,7 @@ function update() {
     }
 }
 
-/* function movearrows() {
+function movearrows() {
     for (let arrow of p.arrows) {
         // Shoot arrow
         if (!arrow && BTN[6]) {
@@ -244,35 +255,29 @@ function update() {
             }
             
             // Set movement and angle
-            let a = document.getElementById(`shot${p.arrows.indexOf(arrow)}`).style;
-            a.left = `${x}px`;
-            a.top = `${y}px`;
+            let b = document.getElementById(`shot${p.arrows.indexOf(arrow)}`).style;
+            b.left = `${x}px`;
+            b.top = `${y}px`;
             
             arrow.x = x;
             arrow.y = y;
             
             // Checking if arrow is out of the screen
             if (arrow.x > window.innerWidth || arrow.y > window.innerHeight || arrow.x < 0 || arrow.y < 0) {
-                player.arrows[player.arrows.indexOf(arrow)] = 0;
+                p.arrows[p.arrows.indexOf(arrow)] = 0;
                 b.left = `${-50}px`;
                 b.top = `${-50}px`;
             }
 
-            if ((player.x < arrow.x + 50) && (player.x + 50 < arrow.x) && (player.y < arrow.y + 50) && (player.y + 50 > arrow.y)) {}
+            if ((p.x < arrow.x + 50) && (p.x + 50 < arrow.x) && (p.y < arrow.y + 50) && (p.y + 50 > arrow.y)) {}
 
-            // Checking if arrow hit enemy and removing it
-            if ((bad.x < arrow.x + 50) && (bad.x + 50 < arrow.x) && (bad.y < arrow.y + 50) && (bad.y + 50 > arrow.y)) {
-                bad.x = 800;
-                bad.y = 200;
-                b.left = `${-50}px`;
-                b.top = `${-50}px`;
-                player.arrows[player.arrows.indexOf(arrow)] = 0;
-            }
+            // Checking if arrow hits opponent and removing it
+            
         
         }
     }
 }
-*/
+
 
 function draw() {
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
@@ -317,7 +322,7 @@ function renderMap() {
 
 function BetterRenderMap() {
     // Camera
-    
+
 
     let img = document.getElementById("lvl1");
     ctxScreen.drawImage(img,0,0,320,180,0,0,320,180);
