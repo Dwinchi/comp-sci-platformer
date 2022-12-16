@@ -127,7 +127,7 @@ function update() {
     }
 
     // Firing bow 
-    if (canFire) {
+    if (p.canFire) {
         movearrows()
     }
     
