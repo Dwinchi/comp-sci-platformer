@@ -214,7 +214,7 @@ function update() {
     }
 }
 
-/* function movearrows() {
+function movearrows() {
     for (let arrow of p.arrows) {
         // Shoot arrow
         if (!arrow && BTN[6]) {
@@ -279,7 +279,7 @@ function update() {
         }
     }
 }
-*/
+
 
 function draw() {
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
