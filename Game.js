@@ -77,7 +77,9 @@ let p = {
     jumpSpd:-4,
     xSpd:0,
     ySpd:0,
-    canJump: false
+    canJump: false,
+    arrows: [0,0,0,0,0],
+    canFire: false
 }
 
 const cUI = document.getElementById("ui-layer");
@@ -117,6 +119,16 @@ function update() {
     if (!AXIS[1]) {
         p.xSpd -= (p.deccel * Math.sign(p.xSpd));
         if (!p.xSpd) { p.x =  Math.floor(p.x); }
+    }
+
+    // If player has bow
+    if (bowPwr) {
+        canFire = true;
+    }
+
+    // Firing bow 
+    if (canFire) {
+        movearrows()
     }
     
     // LIMIT SPEED
@@ -203,13 +215,13 @@ function update() {
 }
 
 /* function movearrows() {
-    for (let arrow of player.arrows) {
+    for (let arrow of p.arrows) {
         // Shoot arrow
         if (!arrow && BTN[6]) {
-            player.arrows[player.arrows.indexOf(arrow)] = {
-                x: player.x + 15,
-                y: player.y + 15,
-                dir: player.dir
+            p.arrows[p.arrows.indexOf(arrow)] = {
+                x: p.w,
+                y: p.h,
+                dir: p.dir
             };
             
             BTN[6] = 0;
@@ -245,7 +257,7 @@ function update() {
             }
             
             // Set movement and angle
-            let b = document.getElementById(`shot${player.arrows.indexOf(arrow)}`).style;
+            let b = document.getElementById(`shot${p.arrows.indexOf(arrow)}`).style;
             b.left = `${x}px`;
             b.top = `${y}px`;
             
@@ -254,21 +266,15 @@ function update() {
             
             // Checking if arrow is out of the screen
             if (arrow.x > window.innerWidth || arrow.y > window.innerHeight || arrow.x < 0 || arrow.y < 0) {
-                player.arrows[player.arrows.indexOf(arrow)] = 0;
+                p.arrows[p.arrows.indexOf(arrow)] = 0;
                 b.left = `${-50}px`;
                 b.top = `${-50}px`;
             }
 
-            if ((player.x < arrow.x + 50) && (player.x + 50 < arrow.x) && (player.y < arrow.y + 50) && (player.y + 50 > arrow.y)) {}
+            if ((p.x < arrow.x + 50) && (p.x + 50 < arrow.x) && (p.y < arrow.y + 50) && (p.y + 50 > arrow.y)) {}
 
-            // Checking if arrow hit enemy and removing it
-            if ((bad.x < arrow.x + 50) && (bad.x + 50 < arrow.x) && (bad.y < arrow.y + 50) && (bad.y + 50 > arrow.y)) {
-                bad.x = 800;
-                bad.y = 200;
-                b.left = `${-50}px`;
-                b.top = `${-50}px`;
-                player.arrows[player.arrows.indexOf(arrow)] = 0;
-            }
+            // Checking if arrow hits opponent and removing it
+            
         
         }
     }
