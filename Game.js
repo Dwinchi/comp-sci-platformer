@@ -63,21 +63,25 @@ var frame = 0;
 
 
 let p = {
-    x:0,
-    y:0,
+    x:10,
+    y:10,
     w:7,
     h:7,
     img:document.getElementById("player-img"),
     st:1,
     s:0,
     si:0,
+    sr:0,
+    st:0,
     accel:0.5,
     deccel:0.25,
     maxSpd:2,
     jumpSpd:-4,
     xSpd:0,
     ySpd:0,
-    canJump: false
+    canJump: false,
+    isOnWall: false,
+    arrows: [0,0,0],
 }
 
 const cUI = document.getElementById("ui-layer");
@@ -111,13 +115,16 @@ function update() {
     }
 
     // GRAVITY
-    p.ySpd += grav;
+    if (!p.isOnWall) { p.ySpd += grav; }
     
     // If player isn't moving, slow down to a halt
     if (!AXIS[1]) {
         p.xSpd -= (p.deccel * Math.sign(p.xSpd));
         if (!p.xSpd) { p.x =  Math.floor(p.x); }
     }
+
+    if (p.xSpd > 0) { p.sr = 0; }
+    else if (p.xSpd < 0) { p.sr = 1; }
     
     // LIMIT SPEED
     p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
@@ -131,7 +138,7 @@ function update() {
 
         // Wall grab
         if (touching(p.x+Math.sign(p.xSpd), p.y, "x")) {
-            if (BTN[8] && BTN[7]) {
+            if ((BTN[8] && BTN[7]) || BTN[7]) {
                 p.ySpd = -4;
                 p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
             } else if (BTN[8] && !BTN[7]) {
@@ -154,48 +161,40 @@ function update() {
         
         p.ySpd = 0;
     } else { p.canJump = false; }
-
-    if (p.st == 1) {
-        // Normal running state
-        
-    } else if (p.st == 2) {
-        // Jump state
-        
-    } else if (p.st == 3) {
-        // Wall slide
-
-        if (BTN[7]) {
-            jump();
-            p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
-            console.log("jumped", (Math.sign(p.xSpd) * -1));
-        }
-    } else if (p.st == 4) {
-        // Wall grab
-        if (BTN[7]) {
-            jump();
-            p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
-            console.log("jumped", (Math.sign(p.xSpd) * -1));
-        }
-    }
     
     p.x += p.xSpd;
     p.y += p.ySpd;
-    
-    draw();
 
-    function SwitchState(state, obj) {
-        obj.st = state;
-
-        switch (obj.st) {
-            case 0:
-                
-                break;
-        
-            case 1:
-                break;
+    /* -------------------------------------------------------------------------- */
+    /*                                  ANIMATION                                 */
+    /* -------------------------------------------------------------------------- */
+    if (p.xSpd == 0) {
+        p.si = 0;
+    } else if (p.xSpd != 0) {
+        if (p.si == 0 && p.st == 0) {
+            p.si = 1;
         }
-        
+
+        p.st++;
+
+        if (p.st == 6) {
+            p.st = 0;
+            p.si++;
+            if (p.si == 5) {
+                p.si = 1
+            }
+        }
     }
+    if (p.ySpd != 0) {
+        // Jumping & falling
+        if (p.ySpd < 0) {
+            p.si = 3;
+        } else if (p.ySpd > 0) {
+            p.si = 4;
+        }
+    }
+
+    draw();
 
     function jump() {
         p.ySpd = p.jumpSpd;
@@ -203,13 +202,13 @@ function update() {
 }
 
 /* function movearrows() {
-    for (let arrow of player.arrows) {
+    for (let arrow of p.arrows) {
         // Shoot arrow
         if (!arrow && BTN[6]) {
-            player.arrows[player.arrows.indexOf(arrow)] = {
-                x: player.x + 15,
-                y: player.y + 15,
-                dir: player.dir
+            p.arrows[p.arrows.indexOf(arrow)] = {
+                x: p.w,
+                y: p.h,
+                dir: p.dir
             };
             
             BTN[6] = 0;
@@ -245,9 +244,9 @@ function update() {
             }
             
             // Set movement and angle
-            let b = document.getElementById(`shot${player.arrows.indexOf(arrow)}`).style;
-            b.left = `${x}px`;
-            b.top = `${y}px`;
+            let a = document.getElementById(`shot${p.arrows.indexOf(arrow)}`).style;
+            a.left = `${x}px`;
+            a.top = `${y}px`;
             
             arrow.x = x;
             arrow.y = y;
@@ -278,34 +277,9 @@ function update() {
 function draw() {
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
 
-    /* let x1 = Math.floor(p.x / 8);
-    let x2 = Math.floor((p.x + p.w) / 8);
-    let y1 = Math.floor(p.y / 8);
-    let y2 = Math.floor((p.y + p.h) / 8);
-
-    ctxEntity.beginPath();
-    ctxEntity.rect(x1 * 8, y1 * 8, 4, 4);
-    ctxEntity.fillStyle = "#c06852";
-    ctxEntity.fill();
-
-    ctxEntity.beginPath();
-    ctxEntity.rect(x2 * 8 + 4, y1 * 8, 4, 4);
-    ctxEntity.fillStyle = "#5a78b2";
-    ctxEntity.fill();
-
-    ctxEntity.beginPath();
-    ctxEntity.rect(x1 * 8, y2 * 8 + 4, 4, 4);
-    ctxEntity.fillStyle = "#6ec077";
-    ctxEntity.fill();
+    ctxEntity.drawImage(p.img,8 * p.si,8 * p.sr,8,8,Math.floor(p.x),Math.floor(p.y),8,8);
     
-    ctxEntity.beginPath();
-    ctxEntity.rect(x2 * 8 + 4, y2 * 8 + 4, 4, 4);
-    ctxEntity.fillStyle = "#f5c47c";
-    ctxEntity.fill(); */
-
-    ctxEntity.drawImage(p.img,Math.floor(p.x),Math.floor(p.y));
-    
-    renderMap();
+    BetterRenderMap();
 }
 
 function renderMap() {
@@ -339,6 +313,16 @@ function renderMap() {
             if (cx/l.gridCellsX == 1) { cy++; cx = 0; }
         }
     }
+}
+
+function BetterRenderMap() {
+    // Camera
+    
+
+    let img = document.getElementById("lvl1");
+    ctxScreen.drawImage(img,0,0,320,180,0,0,320,180);
+
+    
 }
 
 function changeKey(key, state) {
