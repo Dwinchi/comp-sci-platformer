@@ -15,8 +15,11 @@ const frame = function() {
     ctxUI.clearRect(0, 0, cUI.width, cUI.height);
     menu.show(ctxUI);
     let titleImg = new Image();
-    titleImg.src = "images/title.png"; 
+    titleImg.src = "images/title.png";
     ctxUI.drawImage(titleImg, (cUI.width/2 - 100/2), (cUI.height/2 - 100), 100, 100);
+    let exitText = new Image();
+    exitText.src = "images/exit.png";
+    ctxUI.drawImage(exitText, cUI.width/2/2, (cUI.height/2 + 20/2), 20, 20);
     requestAnimationFrame(frame);
 }
 

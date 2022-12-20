@@ -15,3 +15,16 @@ class menuScreen{
         context.strokeRect(this.x,this.y, this.width, this.height);
     }
 }
+
+class button{
+    constructor(x, y, w, h){
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+
+    show(ctx){
+        ctx.fillStyle
+    }
+}
