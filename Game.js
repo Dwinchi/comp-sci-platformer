@@ -16,35 +16,6 @@ let LAYER = level.default.layers;
 8 = j
 */
 
-let LEVEL = level.default.layers[0];
-
-let BOXES = [
-    {
-        x: 0,
-        y: 144,
-        w: 320,
-        h: 40
-    },
-    {
-        x: 64,
-        y: 112,
-        w: 8,
-        h: 8
-    },
-    {
-        x: 88,
-        y: 96,
-        w: 40,
-        h: 16
-    },
-    {
-        x: 136,
-        y: 112,
-        w: 8,
-        h: 8
-    },
-]
-
 // TS means Tilesets
 let TS = {
     x: 4,
@@ -79,10 +50,25 @@ let p = {
     jumpSpd:-4,
     xSpd:0,
     ySpd:0,
+    // states
     canJump: false,
     isOnWall: false,
+    //powers
     arrows: [0,0,0],
     canFire: false,
+    power: false,
+}
+
+// Camera
+let cam = {
+    xs: false,
+    ys: false,
+    x:0,
+    y:0,
+    xSpd: 0,
+    ySpd: 0,
+    clampx:0,
+    clampy:0
 }
 
 const cUI = document.getElementById("ui-layer");
@@ -123,35 +109,20 @@ function update() {
         p.xSpd -= (p.deccel * Math.sign(p.xSpd));
         if (!p.xSpd) { p.x =  Math.floor(p.x); }
     }
-
-    if (p.xSpd > 0) { p.sr = 0; }
-    else if (p.xSpd < 0) { p.sr = 1; }
-
-    // If player has bow
-    if (bowPwr) {
-        canFire = true;
-    }
-
-    // Firing bow 
-    if (canFire) {
-        movearrows()
-    }
     
     // LIMIT SPEED
     p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
     p.ySpd = clamp(p.ySpd,-8,8);
     
     // Horizontal collision
-    if (touching(p.x + p.xSpd, p.y, "x")) {
-        while (!touching(p.x+Math.sign(p.xSpd), p.y, "x")) {
-            p.x += Math.sign(p.xSpd);
-        }
+    if (touching(Math.floor(p.x + p.xSpd + cam.x), p.y, "x")) {
+        while (!touching(Math.floor(p.x+Math.sign(p.xSpd)) + cam.x, p.y, "x")) { p.x += Math.sign(p.xSpd); }
 
         // Wall grab
-        if (touching(p.x+Math.sign(p.xSpd), p.y, "x")) {
+        if (touching(p.x+Math.sign(p.xSpd) + cam.x, p.y, "x")) {
             if ((BTN[8] && BTN[7]) || BTN[7]) {
                 p.ySpd = -4;
-                p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
+                // p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
             } else if (BTN[8] && !BTN[7]) {
                 p.ySpd = 0;
             } else { p.ySpd = 0.1; }
@@ -161,28 +132,66 @@ function update() {
     }
     
     // Vertical collision
-    if (touching(p.x, p.y + p.ySpd, "y")) {
-        while (!touching(p.x, p.y + Math.sign(p.ySpd), "y")) {
-            p.y += Math.sign(p.ySpd);
-        }
-        
-        if (Math.sign(p.ySpd) == 1) {
-            p.canJump = true;
-        }
-        
+    if (touching(p.x + cam.x, p.y + p.ySpd, "y")) {
+        while (!touching(p.x + cam.x, p.y + Math.sign(p.ySpd), "y")) { p.y += Math.sign(p.ySpd); }
+        if (Math.sign(p.ySpd) == 1) { p.canJump = true; }
         p.ySpd = 0;
     } else { p.canJump = false; }
+
+    /* if (Math.floor(p.x + p.xSpd) >= 120 && !cam.xs) {
+        // Move player to 120, add the rest to camspd
+        while (Math.floor(p.x + p.xSpd) != 120) {
+            if (Math.floor(p.x + p.xSpd) > 120) { p.x = Math.floor(p.x) - 1; }
+            else if (Math.floor(p.x + p.xSpd) < 120) { p.x = Math.floor(p.x) + 1; }
+        }
+
+        cam.xs = true;
+    } */
     
-    p.x += p.xSpd;
+
+
+    // Add Math.floor to all of these
+    /* if (cam.xs) { cam.x += Math.floor(p.xSpd); }
+    else { p.x += Math.floor(p.xSpd); }
+    if (cam.ys) { cam.y += Math.floor(p.ySpd); }
+    else { p.y += p.ySpd; } */
+
+    p.x += Math.floor(p.xSpd);
     p.y += p.ySpd;
+
+    /// POWERSSSSSSSSSSSSSSSS
+    // If player has bow
+    if (p.power == 1) {
+        p.canFire = true;
+    }
+
+    // Firing bow 
+    if (p.canFire) {
+        movearrows()
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                    CAMERA                                  */
+    /* -------------------------------------------------------------------------- */
+
+    cam.fxPos = p.x + 160;
+    cam.x = lerp(cam.x, cam.fxPos, 0.01)
 
     /* -------------------------------------------------------------------------- */
     /*                                  ANIMATION                                 */
     /* -------------------------------------------------------------------------- */
+
+    // Set rotation
+    if (p.xSpd > 0) { p.sr = 0; }
+    else if (p.xSpd < 0) { p.sr = 1; }
+
+
     if (p.xSpd == 0) {
+        // Idle
         p.si = 0;
     } else if (p.xSpd != 0) {
         if (p.si == 0 && p.st == 0) {
+            // Start run
             p.si = 1;
         }
 
@@ -190,6 +199,7 @@ function update() {
 
         if (p.st == 6) {
             p.st = 0;
+            // Continue run
             p.si++;
             if (p.si == 5) {
                 p.si = 1
@@ -210,80 +220,85 @@ function update() {
     function jump() {
         p.ySpd = p.jumpSpd;
     }
-}
-
-function movearrows() {
-    for (let arrow of p.arrows) {
-        // Shoot arrow
-        if (!arrow && BTN[6]) {
-            p.arrows[p.arrows.indexOf(arrow)] = {
-                x: p.w,
-                y: p.h,
-                dir: p.dir
-            };
-            
-            BTN[6] = 0;
-        }
-
-        // Move arrows
-        if (arrow) {
-            let x = arrow.x;
-            let y = arrow.y;
-            let dir = arrow.dir;
-            let spd = 6;
-
-            if (dir == 0) {
-                y -= spd;
-            } else if (dir == 4) {
-                y += spd;
-            } else if (dir == 2) {
-                x += spd;
-            } else if (dir == 6) {
-                x -= spd;
-            } else if (dir == 1) {
-                x += (spd / 2);
-                y -= (spd / 2);
-            } else if (dir == 5) {
-                x -= (spd / 2);
-                y += (spd / 2);
-            } else if (dir == 3) {
-                x += (spd / 2);
-                y += (spd / 2);
-            } else if (dir == 7) {
-                x -= (spd / 2);
-                y -= (spd / 2);
+    /* function movearrows() {
+        for (let arrow of p.arrows) {
+            // Shoot arrow
+            if (!arrow && BTN[6]) {
+                p.arrows[p.arrows.indexOf(arrow)] = {
+                    x: p.w,
+                    y: p.h,
+                    dir: p.dir
+                };
+                
+                BTN[6] = 0;
             }
-            
-            // Set movement and angle
-            let b = document.getElementById(`shot${p.arrows.indexOf(arrow)}`).style;
-            b.left = `${x}px`;
-            b.top = `${y}px`;
-            
-            arrow.x = x;
-            arrow.y = y;
-            
-            // Checking if arrow is out of the screen
-            if (arrow.x > window.innerWidth || arrow.y > window.innerHeight || arrow.x < 0 || arrow.y < 0) {
-                p.arrows[p.arrows.indexOf(arrow)] = 0;
-                b.left = `${-50}px`;
-                b.top = `${-50}px`;
-            }
-
-            if ((p.x < arrow.x + 50) && (p.x + 50 < arrow.x) && (p.y < arrow.y + 50) && (p.y + 50 > arrow.y)) {}
-
-            // Checking if arrow hits opponent and removing it
-            
         
+            // Move arrows
+            if (arrow) {
+                let x = arrow.x;
+                let y = arrow.y;
+                let dir = arrow.dir;
+                let spd = 6;
+        
+                if (dir == 0) {
+                    y -= spd;
+                } else if (dir == 4) {
+                    y += spd;
+                } else if (dir == 2) {
+                    x += spd;
+                } else if (dir == 6) {
+                    x -= spd;
+                } else if (dir == 1) {
+                    x += (spd / 2);
+                    y -= (spd / 2);
+                } else if (dir == 5) {
+                    x -= (spd / 2);
+                    y += (spd / 2);
+                } else if (dir == 3) {
+                    x += (spd / 2);
+                    y += (spd / 2);
+                } else if (dir == 7) {
+                    x -= (spd / 2);
+                    y -= (spd / 2);
+                }
+                
+                // Set movement and angle
+                let b = document.getElementById(`shot${p.arrows.indexOf(arrow)}`).style;
+                b.left = `${x}px`;
+                b.top = `${y}px`;
+                
+                arrow.x = x;
+                arrow.y = y;
+                
+                // Checking if arrow is out of the screen
+                if (arrow.x > window.innerWidth || arrow.y > window.innerHeight || arrow.x < 0 || arrow.y < 0) {
+                    p.arrows[p.arrows.indexOf(arrow)] = 0;
+                    b.left = `${-50}px`;
+                    b.top = `${-50}px`;
+                }
+        
+                if ((p.x < arrow.x + 50) && (p.x + 50 < arrow.x) && (p.y < arrow.y + 50) && (p.y + 50 > arrow.y)) {}
+        
+                // Checking if arrow hits opponent and removing it
+                
+            
+            }
         }
-    }
+    } */
 }
-
 
 function draw() {
+    ctxEntity.imageSmoothingEnabled = false;
+    ctxScreen.imageSmoothingEnabled = false;
+    ctxUI.imageSmoothingEnabled = false;
+
+
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
 
     ctxEntity.drawImage(p.img,8 * p.si,8 * p.sr,8,8,Math.floor(p.x),Math.floor(p.y),8,8);
-    
+
+    ctxScreen.clearRect(0, 0, cScreen.width, cScreen.height)
+
     BetterRenderMap();
 }
 
@@ -321,11 +336,8 @@ function renderMap() {
 }
 
 function BetterRenderMap() {
-    // Camera
-
-
     let img = document.getElementById("lvl1");
-    ctxScreen.drawImage(img,0,0,320,180,0,0,320,180);
+    ctxScreen.drawImage(img,cam.x,cam.y,320,180,0,0,320,180);
 
     
 }
@@ -414,9 +426,9 @@ function touching(x, y, dir) {
 }
 
 function resize() {
-    let winWidth = Math.floor(window.innerHeight / 180);
-    let winHeight = Math.floor(window.innerWidth / 320);
-    let SCALE = Math.min(winWidth,winHeight);
+    let winW = Math.floor(window.innerHeight / 180);
+    let winH = Math.floor(window.innerWidth / 320);
+    let SCALE = Math.min(winW,winH);
     
     const layer = document.querySelectorAll('.game-layers');
     
@@ -424,6 +436,24 @@ function resize() {
         l.style.width = `${SCALE * 320}px`;
         l.style.height = `${SCALE * 180}px`;
     });
+
+    // !Changing a bit to make default be full screen
+    /* let winW = window.innerHeight;
+    let winH = window.innerWidth;
+
+    console.log(winW, winH);
+    
+    if (winW > winH) { winW = winW * (9/16); }
+    else { winH = winH * (16/9); }
+
+    console.log(winW, winH);
+    
+    const layer = document.querySelectorAll('.game-layers');
+    
+    layer.forEach(l => {
+        l.style.width = `${winW}px`;
+        l.style.height = `${winH}px`;
+    }); */
 }
 
 function tick() {
@@ -434,6 +464,10 @@ function tick() {
         startTime = time;
         frame = 0;
     }
+}
+
+function lerp(a,b,t) {
+    return a + (b - a) * t;
 }
 
 function clamp(num, min, max) {

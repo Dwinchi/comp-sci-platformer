@@ -6,7 +6,11 @@ body {
 .game-layers {
     position: absolute;
     image-rendering: pixelated;
-    border: 1px solid #444;
+}
+
+#content {
+    position: absolute;
+    left: 0px;
 }
 
 #ui-layer { z-index: 3; }
