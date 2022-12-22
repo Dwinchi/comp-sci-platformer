@@ -109,6 +109,19 @@ function update() {
         p.xSpd -= (p.deccel * Math.sign(p.xSpd));
         if (!p.xSpd) { p.x =  Math.floor(p.x); }
     }
+
+    if (p.xSpd > 0) { p.sr = 0; }
+    else if (p.xSpd < 0) { p.sr = 1; }
+
+    // If player has bow
+    /* if (bowPwr) {
+        canFire = true;
+    } */
+
+    // Firing bow 
+    if (p.canFire) {
+        movearrows()
+    }
     
     // LIMIT SPEED
     p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
@@ -473,5 +486,6 @@ function lerp(a,b,t) {
 function clamp(num, min, max) {
     return Math.min(Math.max(num, min), max);
 }
+
 
 window.onload = startTimer();
