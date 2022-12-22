@@ -188,7 +188,7 @@ function update() {
     /* -------------------------------------------------------------------------- */
 
     cam.fxPos = p.x + 160;
-    cam.x = lerp(cam.x, cam.fxPos, 0.01)
+    cam.x = lerp(cam.x, cam.fxPos, 0.1);
 
     /* -------------------------------------------------------------------------- */
     /*                                  ANIMATION                                 */
@@ -308,51 +308,12 @@ function draw() {
 
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
 
-    ctxEntity.drawImage(p.img,8 * p.si,8 * p.sr,8,8,Math.floor(p.x),Math.floor(p.y),8,8);
+    ctxEntity.drawImage(p.img,8 * p.si,8 * p.sr,8,8,p.x,Math.floor(p.y),8,8);
 
     ctxScreen.clearRect(0, 0, cScreen.width, cScreen.height)
 
-    BetterRenderMap();
-}
-
-function renderMap() {
-    /* 
-    offsets for moving maps
-    ox = offset x
-    oy = offset y
-    ct = current tile
-    t = tile
-    ts = tileset
-    cx = current x tile location
-    cy = current y tile location
-    */
-
-	let cx = 0;
-    let cy = 0;
-    //let ts = l.tileset;
-    
-    for (let l of LAYER) {
-        for (let ct = 0; ct < (l.gridCellsX * l.gridCellsY);  ct++) {
-            // Change LAYER[1] to l once done
-            let tg = parseInt(LAYER[1].data[ct]);
-    
-            let oy = Math.floor(tg / 4);
-            let ox = tg - (oy * 4);
-    
-            let img = document.getElementById(l.tileset);
-            ctxScreen.drawImage(img,ox*8,oy*8,8,8,(cx * 8),(cy * 8),8,8);
-    
-            cx++;
-            if (cx/l.gridCellsX == 1) { cy++; cx = 0; }
-        }
-    }
-}
-
-function BetterRenderMap() {
     let img = document.getElementById("lvl1");
     ctxScreen.drawImage(img,cam.x,cam.y,320,180,0,0,320,180);
-
-    
 }
 
 function changeKey(key, state) {
