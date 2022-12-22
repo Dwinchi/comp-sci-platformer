@@ -128,11 +128,11 @@ function update() {
     p.ySpd = clamp(p.ySpd,-8,8);
     
     // Horizontal collision
-    if (touching(Math.floor(p.x + p.xSpd + cam.x), p.y, "x")) {
-        while (!touching(Math.floor(p.x+Math.sign(p.xSpd)) + cam.x, p.y, "x")) { p.x += Math.sign(p.xSpd); }
+    if (touching(Math.floor(p.x + p.xSpd), p.y, "x")) {
+        while (!touching(Math.floor(p.x+Math.sign(p.xSpd)), p.y, "x")) { p.x += Math.sign(p.xSpd); }
 
         // Wall grab
-        if (touching(p.x+Math.sign(p.xSpd) + cam.x, p.y, "x")) {
+        if (touching(p.x+Math.sign(p.xSpd), p.y, "x")) {
             if ((BTN[8] && BTN[7]) || BTN[7]) {
                 p.ySpd = -4;
                 // p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
@@ -145,23 +145,11 @@ function update() {
     }
     
     // Vertical collision
-    if (touching(p.x + cam.x, p.y + p.ySpd, "y")) {
-        while (!touching(p.x + cam.x, p.y + Math.sign(p.ySpd), "y")) { p.y += Math.sign(p.ySpd); }
+    if (touching(p.x, p.y + p.ySpd, "y")) {
+        while (!touching(p.x, p.y + Math.sign(p.ySpd), "y")) { p.y += Math.sign(p.ySpd); }
         if (Math.sign(p.ySpd) == 1) { p.canJump = true; }
         p.ySpd = 0;
     } else { p.canJump = false; }
-
-    /* if (Math.floor(p.x + p.xSpd) >= 120 && !cam.xs) {
-        // Move player to 120, add the rest to camspd
-        while (Math.floor(p.x + p.xSpd) != 120) {
-            if (Math.floor(p.x + p.xSpd) > 120) { p.x = Math.floor(p.x) - 1; }
-            else if (Math.floor(p.x + p.xSpd) < 120) { p.x = Math.floor(p.x) + 1; }
-        }
-
-        cam.xs = true;
-    } */
-    
-
 
     // Add Math.floor to all of these
     /* if (cam.xs) { cam.x += Math.floor(p.xSpd); }
@@ -183,12 +171,12 @@ function update() {
         movearrows()
     }
 
+
     /* -------------------------------------------------------------------------- */
-    /*                                    CAMERA                                  */
+    /*                                   CAMERA                                   */
     /* -------------------------------------------------------------------------- */
 
-    cam.fxPos = p.x + 160;
-    cam.x = lerp(cam.x, cam.fxPos, 0.1);
+    camera(p);
 
     /* -------------------------------------------------------------------------- */
     /*                                  ANIMATION                                 */
@@ -233,6 +221,23 @@ function update() {
     function jump() {
         p.ySpd = p.jumpSpd;
     }
+
+    function camera(obj) {
+        /* 
+        * Camera follows object and centers in on it
+        */
+
+        //cam.fxPos = p.x + 160;
+        cam.fxPos = obj.x - 156;
+        cam.fyPos = obj.y - 86;
+        cam.x = lerp(cam.x, cam.fxPos, 0.1);
+        cam.y = lerp(cam.y, cam.fyPos, 0.1);
+
+        cam.x = clamp(cam.x, 0, (LAYER[1].gridCellsX * 8) - 320);
+        cam.y = clamp(cam.y, 0, (LAYER[1].gridCellsY * 8) - 180);
+        console.log(LAYER[1].gridCellsX * 8, cam.x);
+    }
+
     /* function movearrows() {
         for (let arrow of p.arrows) {
             // Shoot arrow
@@ -307,10 +312,10 @@ function draw() {
 
 
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
+    ctxScreen.clearRect(0, 0, cScreen.width, cScreen.height);
+    ctxUI.clearRect(0, 0, cEntity.width, cEntity.height);
 
-    ctxEntity.drawImage(p.img,8 * p.si,8 * p.sr,8,8,p.x,Math.floor(p.y),8,8);
-
-    ctxScreen.clearRect(0, 0, cScreen.width, cScreen.height)
+    ctxEntity.drawImage(p.img,8 * p.si,8 * p.sr,8,8,p.x - cam.x,Math.floor(p.y) - cam.y,8,8);
 
     let img = document.getElementById("lvl1");
     ctxScreen.drawImage(img,cam.x,cam.y,320,180,0,0,320,180);
