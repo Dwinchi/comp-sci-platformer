@@ -5,15 +5,15 @@ let LAYER = level.default.layers;
 
 // Initialize variables
 /* 
-0 = up
-1 = down
-2 = left
-3 = right
-4 = shift
-5 = tab
-6 = e
-7 = space
-8 = j
+* 0 = up
+* 1 = down
+* 2 = left
+* 3 = right
+* 4 = shift
+* 5 = tab
+* 6 = e
+* 7 = space
+* 8 = j
 */
 
 // TS means Tilesets
@@ -26,13 +26,13 @@ let TS = {
 let BTN = [0,0,0,0,0,0,0,0];
 let AXIS = [0,0];
 let TIMER;
-let grav = 0.2;
+let grav = 200;
 
 var fps = document.getElementById("fps");
 var startTime = Date.now();
 var frame = 0;
 
-
+// Making all forces into 1000 based (1000 == 1)
 let p = {
     x:10,
     y:10,
@@ -44,10 +44,10 @@ let p = {
     si:0,
     sr:0,
     st:0,
-    accel:0.5,
-    deccel:0.25,
-    maxSpd:2,
-    jumpSpd:-4,
+    accel:500,
+    deccel:250,
+    maxSpd:2000,
+    jumpSpd:-3000,
     xSpd:0,
     ySpd:0,
     // states
@@ -61,14 +61,8 @@ let p = {
 
 // Camera
 let cam = {
-    xs: false,
-    ys: false,
     x:0,
-    y:0,
-    xSpd: 0,
-    ySpd: 0,
-    clampx:0,
-    clampy:0
+    y:0
 }
 
 const cUI = document.getElementById("ui-layer");
@@ -86,13 +80,18 @@ function startTimer() {
 
 function update() {
     tick();
-    
+    //testing();
     /* -------------------------------------------------------------------------- */
     /*                               Player movement                              */
     /* -------------------------------------------------------------------------- */
-    
-    // If player is moving, speed up
+    // Accelerate
     if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
+    
+    // Deccelerate
+    if (!AXIS[1]) {
+        p.xSpd -= (p.deccel * Math.sign(p.xSpd));
+        if (!p.xSpd) { p.x =  Math.floor(p.x); }
+    }
 
     // Jump
     if (BTN[7] && p.canJump) {
@@ -104,37 +103,22 @@ function update() {
     // GRAVITY
     if (!p.isOnWall) { p.ySpd += grav; }
     
-    // If player isn't moving, slow down to a halt
-    if (!AXIS[1]) {
-        p.xSpd -= (p.deccel * Math.sign(p.xSpd));
-        if (!p.xSpd) { p.x =  Math.floor(p.x); }
-    }
-
     if (p.xSpd > 0) { p.sr = 0; }
     else if (p.xSpd < 0) { p.sr = 1; }
 
-    // If player has bow
-    /* if (bowPwr) {
-        canFire = true;
-    } */
-
-    // Firing bow 
-    if (p.canFire) {
-        movearrows()
-    }
     
     // LIMIT SPEED
     p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
-    p.ySpd = clamp(p.ySpd,-8,8);
+    p.ySpd = clamp(p.ySpd,-4000,4000);
     
     // Horizontal collision
-    if (touching(Math.floor(p.x + p.xSpd), p.y, "x")) {
-        while (!touching(Math.floor(p.x+Math.sign(p.xSpd)), p.y, "x")) { p.x += Math.sign(p.xSpd); }
-
+    if (touching(p.x + (p.xSpd/1000), p.y, "x")) {
+        while (!touching(p.x+Math.sign(p.xSpd), p.y, "x")) { p.x += Math.sign(p.xSpd); }
+        
         // Wall grab
         if (touching(p.x+Math.sign(p.xSpd), p.y, "x")) {
             if ((BTN[8] && BTN[7]) || BTN[7]) {
-                p.ySpd = -4;
+                p.ySpd = p.jumpSpd;
                 // p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
             } else if (BTN[8] && !BTN[7]) {
                 p.ySpd = 0;
@@ -143,35 +127,35 @@ function update() {
 
         p.xSpd = 0;
     }
+    p.x += Math.floor(p.xSpd / 1000);
     
     // Vertical collision
-    if (touching(p.x, p.y + p.ySpd, "y")) {
+    if (touching(p.x, p.y + (p.ySpd/1000), "y")) {
         while (!touching(p.x, p.y + Math.sign(p.ySpd), "y")) { p.y += Math.sign(p.ySpd); }
         if (Math.sign(p.ySpd) == 1) { p.canJump = true; }
         p.ySpd = 0;
     } else { p.canJump = false; }
+    p.y += (p.ySpd / 1000);
 
-    // Add Math.floor to all of these
-    /* if (cam.xs) { cam.x += Math.floor(p.xSpd); }
-    else { p.x += Math.floor(p.xSpd); }
-    if (cam.ys) { cam.y += Math.floor(p.ySpd); }
-    else { p.y += p.ySpd; } */
-
-    p.x += Math.floor(p.xSpd);
-    p.y += p.ySpd;
-
-    /// POWERSSSSSSSSSSSSSSSS
+    /* -------------------------------------------------------------------------- */
+    /*                                   POWERS                                   */
+    /* -------------------------------------------------------------------------- */
     // If player has bow
-    if (p.power == 1) {
+    /* if (p.power == 1) {
         p.canFire = true;
+    }
+    
+    // If player has bow
+    if (bowPwr) {
+        canFire = true;
     }
 
     // Firing bow 
     if (p.canFire) {
         movearrows()
-    }
+    } */
 
-
+    
     /* -------------------------------------------------------------------------- */
     /*                                   CAMERA                                   */
     /* -------------------------------------------------------------------------- */
@@ -218,6 +202,24 @@ function update() {
 
     draw();
 
+    function testing() {
+        // PHYSICS
+        if (AXIS[0]) { p.ySpd += (p.accel*AXIS[0]); }
+        if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
+        // PHYSICS
+        if (!AXIS[0]) {
+            p.ySpd -= (p.deccel * Math.sign(p.ySpd));
+            if (!p.ySpd) { p.y = Math.floor(p.y); }
+        }
+        if (!AXIS[1]) {
+            p.xSpd -= (p.deccel * Math.sign(p.xSpd));
+            if (!p.xSpd) { p.x =  Math.floor(p.x); }
+        }
+        // LIMIT SPEED
+        p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
+        p.ySpd = clamp(p.ySpd,-p.maxSpd,p.maxSpd);
+    }
+
     function jump() {
         p.ySpd = p.jumpSpd;
     }
@@ -227,15 +229,13 @@ function update() {
         * Camera follows object and centers in on it
         */
 
-        //cam.fxPos = p.x + 160;
         cam.fxPos = obj.x - 156;
         cam.fyPos = obj.y - 86;
         cam.x = lerp(cam.x, cam.fxPos, 0.1);
         cam.y = lerp(cam.y, cam.fyPos, 0.1);
 
-        cam.x = clamp(cam.x, 0, (LAYER[1].gridCellsX * 8) - 320);
-        cam.y = clamp(cam.y, 0, (LAYER[1].gridCellsY * 8) - 180);
-        console.log(LAYER[1].gridCellsX * 8, cam.x);
+        cam.x = clamp(cam.x, 0, (LAYER[0].gridCellsX * 8) - 320);
+        cam.y = clamp(cam.y, 0, (LAYER[0].gridCellsY * 8) - 180);
     }
 
     /* function movearrows() {
@@ -361,6 +361,9 @@ document.addEventListener("keyup", function(e) { changeKey(e.key, 0) });
 window.addEventListener("resize", resize);
 
 function touching(x, y, dir) {
+    x = Math.floor(x);
+    y = Math.floor(y);
+
     let x1;
     let x2;
     let y1;
@@ -370,7 +373,7 @@ function touching(x, y, dir) {
     let t2;
     let t3;
     
-    let l = LAYER[1];
+    let l = LAYER[0];
 
     if (dir == "x") {
         x1 = Math.floor((x) / 8);
