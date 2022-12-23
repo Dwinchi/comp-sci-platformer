@@ -16,6 +16,15 @@ let LAYER = level.default.layers;
 * 8 = j
 */
 
+// Short for Game Controller
+let GC = {
+    st: 0,
+    music: "",
+    level: 0,
+    gm: 0,
+
+}
+
 // TS means Tilesets
 let TS = {
     x: 4,
@@ -53,6 +62,9 @@ let p = {
     // states
     canJump: false,
     isOnWall: false,
+    isOnGround: false,
+    //timer
+    wallJumpDelay: 0,
     //powers
     arrows: [0,0,0],
     canFire: false,
@@ -84,47 +96,45 @@ function update() {
     /* -------------------------------------------------------------------------- */
     /*                               Player movement                              */
     /* -------------------------------------------------------------------------- */
-    // Accelerate
-    if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
-    
-    // Deccelerate
-    if (!AXIS[1]) {
-        p.xSpd -= (p.deccel * Math.sign(p.xSpd));
-        if (!p.xSpd) { p.x =  Math.floor(p.x); }
+    p.isOnWall = touching(p.x + 1, p.y, "x") - touching(p.x - 1, p.y, "x");
+    p.isOnGround = touching(p.x, p.y + 1, "x");
+
+    p.wallJumpDelay = Math.max(p.wallJumpDelay-1,0);
+    if (!p.wallJumpDelay) {
+        // Accelerate
+        if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
+        
+        // Deccelerate
+        if (!AXIS[1]) {
+            p.xSpd -= (p.deccel * Math.sign(p.xSpd));
+            if (!p.xSpd) { p.x =  Math.floor(p.x); }
+        }
+        p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
     }
 
-    // Jump
-    if (BTN[7] && p.canJump) {
+    // Walljump
+    if (p.isOnWall && !p.isOnGround && BTN[7]) {
+        p.wallJumpDelay = 10;
+        p.xSpd = -p.isOnWall * 2000;
         p.ySpd = p.jumpSpd;
-        p.canJump = 0;
         BTN[7] = 0;
     }
 
-    // GRAVITY
+    // Jump
+    if (BTN[7] && p.isOnGround) {
+        p.ySpd = p.jumpSpd;
+        BTN[7] = 0;
+    }
+    
+    // Gravity
     if (!p.isOnWall) { p.ySpd += grav; }
+    else { p.ySpd += grav / 2; }
     
-    if (p.xSpd > 0) { p.sr = 0; }
-    else if (p.xSpd < 0) { p.sr = 1; }
-
-    
-    // LIMIT SPEED
-    p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
     p.ySpd = clamp(p.ySpd,-4000,4000);
     
     // Horizontal collision
     if (touching(p.x + (p.xSpd/1000), p.y, "x")) {
         while (!touching(p.x+Math.sign(p.xSpd), p.y, "x")) { p.x += Math.sign(p.xSpd); }
-        
-        // Wall grab
-        if (touching(p.x+Math.sign(p.xSpd), p.y, "x")) {
-            if ((BTN[8] && BTN[7]) || BTN[7]) {
-                p.ySpd = p.jumpSpd;
-                // p.xSpd = 8 * (Math.sign(p.xSpd) * -1);
-            } else if (BTN[8] && !BTN[7]) {
-                p.ySpd = 0;
-            } else { p.ySpd = 0.1; }
-        }
-
         p.xSpd = 0;
     }
     p.x += Math.floor(p.xSpd / 1000);
@@ -132,9 +142,8 @@ function update() {
     // Vertical collision
     if (touching(p.x, p.y + (p.ySpd/1000), "y")) {
         while (!touching(p.x, p.y + Math.sign(p.ySpd), "y")) { p.y += Math.sign(p.ySpd); }
-        if (Math.sign(p.ySpd) == 1) { p.canJump = true; }
         p.ySpd = 0;
-    } else { p.canJump = false; }
+    }
     p.y += (p.ySpd / 1000);
 
     /* -------------------------------------------------------------------------- */
@@ -199,6 +208,8 @@ function update() {
             p.si = 4;
         }
     }
+
+    if (p.isOnWall && !p.isOnGround) { p.si = 5; }
 
     draw();
 
@@ -394,17 +405,19 @@ function touching(x, y, dir) {
 
     // Vertical
     if (t1 == 1 || t0 == 1) {
-        return true;
+        return 1;
     } else if (t2 == 1 || t3 == 1) {
-        return true;
+        return 1;
     }
     
     // Horizontal
     if (t1 == 1 || t3 == 1) {
-        return true;
+        return 1;
     } else if (t0 == 1 || t2 == 1) {
-        return true;
+        return 1;
     }
+
+    return 0;
 }
 
 function resize() {
