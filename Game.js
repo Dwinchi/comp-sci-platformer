@@ -35,7 +35,7 @@ let TS = {
 let BTN = [0,0,0,0,0,0,0,0];
 let AXIS = [0,0];
 let TIMER;
-let grav = 200;
+let grav = 300;
 
 var fps = document.getElementById("fps");
 var startTime = Date.now();
@@ -53,10 +53,10 @@ let p = {
     si:0,
     sr:0,
     st:0,
-    accel:500,
-    deccel:250,
+    accel:300,
+    deccel:600,
     maxSpd:2000,
-    jumpSpd:-3000,
+    jumpSpd:-4000,
     xSpd:0,
     ySpd:0,
     // states
@@ -96,40 +96,47 @@ function update() {
     /* -------------------------------------------------------------------------- */
     /*                               Player movement                              */
     /* -------------------------------------------------------------------------- */
-    p.isOnWall = touching(p.x + 1, p.y, "x") - touching(p.x - 1, p.y, "x");
     p.isOnGround = touching(p.x, p.y + 1, "x");
-
     p.wallJumpDelay = Math.max(p.wallJumpDelay-1,0);
+    
     if (!p.wallJumpDelay) {
         // Accelerate
         if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
         
         // Deccelerate
         if (!AXIS[1]) {
+            if ((Math.sign(p.xSpd) == 1 && Math.sign(p.xSpd - (p.deccel * Math.sign(p.xSpd))) == -1)
+            || (Math.sign(p.xSpd) == -1 && Math.sign(p.xSpd - (p.deccel * Math.sign(p.xSpd))) == 1)
+            ) {
+                p.xSpd = 0;
+            }
             p.xSpd -= (p.deccel * Math.sign(p.xSpd));
             if (!p.xSpd) { p.x =  Math.floor(p.x); }
         }
         p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
     }
 
-    // Walljump
+    p.isOnWall = touching(p.x + (1*Math.sign(p.xSpd)), p.y, "x");
+
+    // Wall jump
     if (p.isOnWall && !p.isOnGround && BTN[7]) {
-        p.wallJumpDelay = 10;
-        p.xSpd = -p.isOnWall * 2000;
+        p.wallJumpDelay = 3;
+        p.xSpd = -Math.sign(p.xSpd) * 2000;
         p.ySpd = p.jumpSpd;
+        p.isOnWall = 0;
         BTN[7] = 0;
     }
-
+    
     // Jump
     if (BTN[7] && p.isOnGround) {
         p.ySpd = p.jumpSpd;
         BTN[7] = 0;
     }
-    
-    // Gravity
-    if (!p.isOnWall) { p.ySpd += grav; }
-    else { p.ySpd += grav / 2; }
-    
+
+    // Wall slide
+    if (p.isOnWall && p.ySpd > 0) { p.ySpd = 150; }
+    else { p.ySpd += grav; }
+
     p.ySpd = clamp(p.ySpd,-4000,4000);
     
     // Horizontal collision
@@ -193,10 +200,10 @@ function update() {
 
         if (p.st == 6) {
             p.st = 0;
-            // Continue run
+            // Continue animation
             p.si++;
-            if (p.si == 5) {
-                p.si = 1
+            if (p.si >= 5) {
+                p.si = 1;
             }
         }
     }
