@@ -19,12 +19,12 @@
   "layers": [
     {
       "definition": "tile",
-      "name": "Obj",
+      "name": "Env",
       "gridSize": {"x": 8, "y": 8},
       "exportID": "77539480",
       "exportMode": 0,
       "arrayMode": 0,
-      "defaultTileset": "BT"
+      "defaultTileset": "Interactables"
     },
     {
       "definition": "tile",
@@ -38,6 +38,6 @@
   ],
   "entities": [],
   "tilesets": [
-    {"label": "T-0", "path": "Level 1-1/Level 1-1/tileset 1.png", "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFgAAAAoCAYAAAB6tz31AAADd0lEQVRoQ+1aMWgVQRC9QwvBymARMIIggZAQrOws0ghaaJFKwc4mQVKmSGVjI4iFolhoIaSwSqGFgo29hciHRFDBIsEUmjpg4Msczrne3903u7Pn7Q/3m3B5uzt7b2ffvZvb8vGX28Oi/zkZuPJ2x4lNzE8Wxy/cKX30lVcf3hyemT/ZCsUzU8eKN6+3C9f4CG9lUsagFP/T9r43zOrWzwr/+nGv+nv23ER9vXFtuniwcDeM4G+DH/8Qorm2EWiOh3C6E0181F8Sf/HF5xFi6R9ELv0gwe+WFof3507Uq/joaFncOvirGprrS5enitl7g8I1PsJpUpr4qD/FJwlA99tMcbP9y5Vn/gwmgjntU29J0qj365v1tmqOj/DU87HF3xvsqsKcXn4qI9imMU3NCb0+f2O2Jtg2PsJD44W2p/hMcOz9LzzZwASHTkzanjPU1R7hroeLND7qnyK+OINV+8TRGUmABPdtYdSfCXZJIOqPcBp/rAluY9HNMYlApMGvLp6qHoSun5jgWA0yfWFz6yKNRXgqKXBJhUSD2Y657FqvwZYXBF44iQaTJeMXJXrpaCaiOIPb2I5IwxDexpxCJYLaN32yOUZPsGeVJBqMFllMcK/Bo7UGyTOg12ClBqPEE2cw2goxONJYCd61D0bxYbky51oE0kjCn08e8fpUn49F/VPgJROMtkIMjnwuwsmDonos7yxUVrThFH/t4Fc1hA1nD6zBK4IlYu57oYitNfh8KDL4jJv1YptP9flYin/9w3erz0XjS/E6g2M0FvWRaKytnOnznTZfGtqe580ShOrBGjxLgtHCpcKRxqeIk7UGtyVdXJuQ1CJipNGsfWSrwdobk/SX1CJiHu5mYtQEp9gOsWO09ckKzUciEURw7Pxo/LLrcxH0UdRXEEdGv0sfLFnAzs9FMMGucwc5+2D0jCArN0JwynMI6NwB4USwbaK5+2Ck8Tz/SoO7PhfRlIhQXxvaXuuDkTSY8+l9sPJcBCK798F/CNbaMVf/3gevb1qfAUhjpXgWPhhts65xzbkK77Gf/3Fjvno0ehFA9Vqav7YejArqiKNsCM7VB6PjqWNBcM4++FAQnLMPRud/xyKDY4sp6OYQjjSe+qOvxihG1hqM3vW1uKQejM49jAXBWqJi+0vqwYcmg22ZgLYw+ubHXxY0PlZr034Daedgz/AaNykAAAAASUVORK5CYII=", "tileWidth": 8, "tileHeight": 8, "tileSeparationX": 0, "tileSeparationY": 0, "tileMarginX": 0, "tileMarginY": 0}
+    {"label": "Interactables", "path": "../sprites/tilesets/Interactables.png", "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAICAYAAACYhf2vAAAAAXNSR0IArs4c6QAAAC1JREFUOI1jbC6b858BD6jp2ohPmkFr7Sa88tfNzfHKM+GVpQMYdcCoA0YdAACfPwcpuS7WgwAAAABJRU5ErkJggg==", "tileWidth": 8, "tileHeight": 8, "tileSeparationX": 0, "tileSeparationY": 0, "tileMarginX": 0, "tileMarginY": 0}
   ]
 }

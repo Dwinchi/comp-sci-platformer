@@ -1,7 +1,7 @@
 console.clear();
 
-import * as level from "./levels/L-0b.json" assert { type: "json" };
-let LAYER = level.default.layers;
+import * as level from "./levels/1-1/1-1.json" assert { type: "json" };
+let LAYERS = level.default.layers;
 
 // Initialize variables
 /* 
@@ -22,20 +22,27 @@ let GC = {
     music: "",
     level: 0,
     gm: 0,
-
 }
+
+GC.level = "1-1";
 
 // TS means Tilesets
 let TS = {
-    x: 4,
-    y: 3,
-    tiles: [1,1,1,1,1,1,1,0,1,1,1,0]
+    x: 11,
+    y: 5,
+    tiles: [
+        1,1,1,1,1,1,1,1,1,1,0,
+        1,1,1,1,1,1,1,1,1,1,0,
+        1,1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,1,
+        0,0,0,0,1,1,1,1,1,0,0,
+    ]
 };
 
 let BTN = [0,0,0,0,0,0,0,0];
 let AXIS = [0,0];
 let TIMER;
-let grav = 300;
+let grav = 100;
 
 var fps = document.getElementById("fps");
 var startTime = Date.now();
@@ -53,10 +60,10 @@ let p = {
     si:0,
     sr:0,
     st:0,
-    accel:300,
-    deccel:600,
+    accel:200,
+    deccel:400,
     maxSpd:2000,
-    jumpSpd:-4000,
+    jumpSpd:-2000,
     xSpd:0,
     ySpd:0,
     // states
@@ -74,7 +81,8 @@ let p = {
 // Camera
 let cam = {
     x:0,
-    y:0
+    y:0,
+    img: null,
 }
 
 const cUI = document.getElementById("ui-layer");
@@ -92,11 +100,11 @@ function startTimer() {
 
 function update() {
     tick();
-    //testing();
+    
     /* -------------------------------------------------------------------------- */
     /*                               Player movement                              */
     /* -------------------------------------------------------------------------- */
-    p.isOnGround = touching(p.x, p.y + 1, "x");
+    p.isOnGround = Touching(p.x, p.y + 1, "x");
     p.wallJumpDelay = Math.max(p.wallJumpDelay-1,0);
     
     if (!p.wallJumpDelay) {
@@ -116,43 +124,44 @@ function update() {
         p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
     }
 
-    p.isOnWall = touching(p.x + (1*Math.sign(p.xSpd)), p.y, "x");
-
+    p.isOnWall = Touching(p.x + (1 * Math.sign(p.xSpd)), p.y, "x");
+    
     // Wall jump
     if (p.isOnWall && !p.isOnGround && BTN[7]) {
         p.wallJumpDelay = 3;
-        p.xSpd = -Math.sign(p.xSpd) * 2000;
-        p.ySpd = p.jumpSpd;
+        p.xSpd = -Math.sign(p.xSpd) * p.maxSpd;
         p.isOnWall = 0;
+        p.ySpd = p.jumpSpd;
         BTN[7] = 0;
     }
-    
     // Jump
     if (BTN[7] && p.isOnGround) {
         p.ySpd = p.jumpSpd;
         BTN[7] = 0;
     }
+    
+    if (p.isOnWall) { p.xSpd = 0; }
 
     // Wall slide
-    if (p.isOnWall && p.ySpd > 0) { p.ySpd = 150; }
+    if (p.isOnWall && p.ySpd > 0) { p.ySpd = grav/2; }
     else { p.ySpd += grav; }
 
     p.ySpd = clamp(p.ySpd,-4000,4000);
     
     // Horizontal collision
-    if (touching(p.x + (p.xSpd/1000), p.y, "x")) {
-        while (!touching(p.x+Math.sign(p.xSpd), p.y, "x")) { p.x += Math.sign(p.xSpd); }
+    if (Touching(p.x + (p.xSpd/1000), p.y, "x")) {
+        while (!Touching(p.x + Math.sign(p.xSpd), p.y, "x")) { p.x += Math.sign(p.xSpd); }
         p.xSpd = 0;
     }
     p.x += Math.floor(p.xSpd / 1000);
     
     // Vertical collision
-    if (touching(p.x, p.y + (p.ySpd/1000), "y")) {
-        while (!touching(p.x, p.y + Math.sign(p.ySpd), "y")) { p.y += Math.sign(p.ySpd); }
+    if (Touching(p.x, p.y + (p.ySpd/1000), "y")) {
+        while (!Touching(p.x, p.y + Math.sign(p.ySpd), "y")) { p.y += Math.sign(p.ySpd); }
         p.ySpd = 0;
     }
     p.y += (p.ySpd / 1000);
-
+    
     /* -------------------------------------------------------------------------- */
     /*                                   POWERS                                   */
     /* -------------------------------------------------------------------------- */
@@ -186,16 +195,11 @@ function update() {
     if (p.xSpd > 0) { p.sr = 0; }
     else if (p.xSpd < 0) { p.sr = 1; }
 
-
-    if (p.xSpd == 0) {
-        // Idle
-        p.si = 0;
-    } else if (p.xSpd != 0) {
-        if (p.si == 0 && p.st == 0) {
-            // Start run
-            p.si = 1;
-        }
-
+    // Idle
+    if (p.isOnGround && !p.xSpd) { p.si = 0; }
+    // Run
+    if (p.xSpd) {
+        if (p.si == 0 && p.st == 0) { p.si = 1; }
         p.st++;
 
         if (p.st == 6) {
@@ -207,53 +211,32 @@ function update() {
             }
         }
     }
-    if (p.ySpd != 0) {
+    if (!p.isOnGround) {
         // Jumping & falling
-        if (p.ySpd < 0) {
-            p.si = 3;
-        } else if (p.ySpd > 0) {
-            p.si = 4;
-        }
+        if (p.ySpd < 0) { p.si = 3; }
+        if (p.ySpd > 0) { p.si = 4; }
     }
 
     if (p.isOnWall && !p.isOnGround) { p.si = 5; }
 
     draw();
 
-    function testing() {
-        // PHYSICS
-        if (AXIS[0]) { p.ySpd += (p.accel*AXIS[0]); }
-        if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
-        // PHYSICS
-        if (!AXIS[0]) {
-            p.ySpd -= (p.deccel * Math.sign(p.ySpd));
-            if (!p.ySpd) { p.y = Math.floor(p.y); }
-        }
-        if (!AXIS[1]) {
-            p.xSpd -= (p.deccel * Math.sign(p.xSpd));
-            if (!p.xSpd) { p.x =  Math.floor(p.x); }
-        }
-        // LIMIT SPEED
-        p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
-        p.ySpd = clamp(p.ySpd,-p.maxSpd,p.maxSpd);
-    }
-
-    function jump() {
-        p.ySpd = p.jumpSpd;
-    }
-
     function camera(obj) {
         /* 
         * Camera follows object and centers in on it
         */
+        cam.img = document.getElementById("l1-1")
 
-        cam.fxPos = obj.x - 156;
-        cam.fyPos = obj.y - 86;
-        cam.x = lerp(cam.x, cam.fxPos, 0.1);
-        cam.y = lerp(cam.y, cam.fyPos, 0.1);
-
-        cam.x = clamp(cam.x, 0, (LAYER[0].gridCellsX * 8) - 320);
-        cam.y = clamp(cam.y, 0, (LAYER[0].gridCellsY * 8) - 180);
+        if (LAYERS[1].gridCellsX > 40) {
+            cam.fxPos = obj.x - 156;
+            cam.x = lerp(cam.x, cam.fxPos, 0.1);
+            cam.x = clamp(cam.x, 0, (LAYERS[1].gridCellsX * 8) - 320);
+        }
+        if (LAYERS[1].gridCellsY > 23) {
+            cam.fyPos = obj.y - 86;
+            cam.y = lerp(cam.y, cam.fyPos, 0.1);
+            cam.y = clamp(cam.y, 0, (LAYERS[1].gridCellsY * 8) - 180);
+        }
     }
 
     /* function movearrows() {
@@ -328,15 +311,13 @@ function draw() {
     ctxScreen.imageSmoothingEnabled = false;
     ctxUI.imageSmoothingEnabled = false;
 
-
     ctxEntity.clearRect(0, 0, cEntity.width, cEntity.height);
     ctxScreen.clearRect(0, 0, cScreen.width, cScreen.height);
     ctxUI.clearRect(0, 0, cEntity.width, cEntity.height);
 
     ctxEntity.drawImage(p.img,8 * p.si,8 * p.sr,8,8,p.x - cam.x,Math.floor(p.y) - cam.y,8,8);
 
-    let img = document.getElementById("lvl1");
-    ctxScreen.drawImage(img,cam.x,cam.y,320,180,0,0,320,180);
+    ctxScreen.drawImage(cam.img,cam.x,cam.y,320,180,0,0,320,180);
 }
 
 function changeKey(key, state) {
@@ -378,7 +359,7 @@ document.addEventListener("keydown", function(e) { changeKey(e.key, 1) });
 document.addEventListener("keyup", function(e) { changeKey(e.key, 0) });
 window.addEventListener("resize", resize);
 
-function touching(x, y, dir) {
+function Touching(x, y, dir) {
     x = Math.floor(x);
     y = Math.floor(y);
 
@@ -391,7 +372,7 @@ function touching(x, y, dir) {
     let t2;
     let t3;
     
-    let l = LAYER[0];
+    let l = LAYERS[0];
 
     if (dir == "x") {
         x1 = Math.floor((x) / 8);
@@ -475,6 +456,5 @@ function lerp(a,b,t) {
 function clamp(num, min, max) {
     return Math.min(Math.max(num, min), max);
 }
-
 
 window.onload = startTimer();
