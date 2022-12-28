@@ -12,6 +12,7 @@ let currentPlayer = true;
 const menu = new menuScreen((cUI.width/2 - menuWidth/2), (cUI.height/2 - menuHeight/2), menuWidth, menuHeight, 2);
 
 const frame = function() {
+    resize();
     ctxUI.clearRect(0, 0, cUI.width, cUI.height);
     menu.show(ctxUI);
     let titleImg = new Image();
@@ -23,4 +24,19 @@ const frame = function() {
     requestAnimationFrame(frame);
 }
 
+window.addEventListener("resize", resize);
+
 frame();
+
+function resize() {
+    let winW = Math.floor(window.innerHeight / 180);
+    let winH = Math.floor(window.innerWidth / 320);
+    let SCALE = Math.min(winW,winH);
+    
+    const layer = document.querySelectorAll('.game-layers');
+    
+    layer.forEach(l => {
+        l.style.width = `${SCALE * 320}px`;
+        l.style.height = `${SCALE * 180}px`;
+    });
+}
