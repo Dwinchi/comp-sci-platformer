@@ -43,9 +43,8 @@ export class Player {
             
             // Deccelerate
             if (!this.AXIS[1]) {
-                if ((Math.sign(this.xSpd) == 1 && Math.sign(this.xSpd - (Physics.deccel * Math.sign(this.xSpd))) == -1)
-                || (Math.sign(this.xSpd) == -1 && Math.sign(this.xSpd - (Physics.deccel * Math.sign(this.xSpd))) == 1)
-                ) {
+                if ((this.xSpd > 0 && this.xSpd - (Physics.deccel * Math.sign(this.xSpd)) < 0) ||
+                (this.xSpd < 0 && this.xSpd - (Physics.deccel * Math.sign(this.xSpd)) > 0)) {
                     this.xSpd = 0;
                 }
                 this.xSpd -= (Physics.deccel * Math.sign(this.xSpd));
@@ -59,8 +58,8 @@ export class Player {
         // Wall jump
         if (this.isOnWall && !this.isOnGround && this.BTN[7]) {
             this.wallJumpDelay = 3;
-            this.xSpd = -Math.sign(this.xSpd) * Physics.maxSpd;
             this.isOnWall = 0;
+            this.xSpd = -Math.sign(this.xSpd) * Physics.maxSpd;
             this.ySpd = Physics.jumpSpd;
             this.BTN[7] = 0;
         }
@@ -84,7 +83,7 @@ export class Player {
             while (!Touching(this, this.x + Math.sign(this.xSpd), this.y, "x")) { this.x += Math.sign(this.xSpd); }
             this.xSpd = 0;
         }
-        this.x += Math.floor(this.xSpd / 1000);
+        this.x += Math.floor(Math.abs(this.xSpd) / 1000) * Math.sign(this.xSpd);
         
         // Vertical collision
         if (Touching(this, this.x, this.y + (this.ySpd/1000), "y")) {
@@ -121,7 +120,9 @@ export class Player {
             // Jumping & falling
             if (this.ySpd < 0) { this.si = 3; }
             if (this.ySpd > 0) { this.si = 4; }
+            
         }
+
 
         if (this.isOnWall && !this.isOnGround) { this.si = 5; }
     }

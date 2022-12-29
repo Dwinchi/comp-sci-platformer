@@ -5,6 +5,9 @@ import { Lerp, Clamp } from './Util.js';
 import { Player } from "./Player.js";
 let LAYERS = level.default.layers;
 
+let SCREEN_HEIGHT = 180;
+let SCREEN_WIDTH = 320;
+
 // Initialize variables
 /* 
 * 0 = up
@@ -34,7 +37,7 @@ export let Physics = {
     accel: 200,
     deccel: 400,
     maxSpd: 2000,
-    jumpSpd: -3000,
+    jumpSpd: -3500,
 }
 
 let TIMER;
@@ -106,15 +109,15 @@ function update() {
         //* Camera follows object
         Cam.img = document.getElementById("l1-1")
 
-        if (LAYERS[1].gridCellsX > 40) {
-            Cam.fxPos = obj.x - 156;
+        if (LAYERS[1].gridCellsX > Math.ceil(SCREEN_WIDTH / 8)) {
+            Cam.fxPos = obj.x - (SCREEN_WIDTH / 2) - 4;
             Cam.x = Lerp(Cam.x, Cam.fxPos, 0.1);
-            Cam.x = Clamp(Cam.x, 0, (LAYERS[1].gridCellsX * 8) - 320);
+            Cam.x = Clamp(Cam.x, 0, (LAYERS[1].gridCellsX * 8) - SCREEN_WIDTH);
         }
-        if (LAYERS[1].gridCellsY > 23) {
-            Cam.fyPos = obj.y - 86;
+        if (LAYERS[1].gridCellsY > Math.ceil(SCREEN_HEIGHT / 8)) {
+            Cam.fyPos = obj.y - (SCREEN_HEIGHT / 2) - 4;
             Cam.y = Lerp(Cam.y, Cam.fyPos, 0.1);
-            Cam.y = Clamp(Cam.y, 0, (LAYERS[1].gridCellsY * 8) - 180);
+            Cam.y = Clamp(Cam.y, 0, (LAYERS[1].gridCellsY * 8) - SCREEN_HEIGHT);
         }
     }
 
@@ -239,15 +242,15 @@ document.addEventListener("keyup", function(e) { changeKey(e.key, 0) });
 window.addEventListener("resize", resize);
 
 function resize() {
-    let winW = Math.floor(window.innerHeight / 180);
-    let winH = Math.floor(window.innerWidth / 320);
+    let winW = Math.floor(window.innerHeight / SCREEN_HEIGHT);
+    let winH = Math.floor(window.innerWidth / SCREEN_WIDTH);
     let SCALE = Math.min(winW,winH);
     
     const layer = document.querySelectorAll('.game-layers');
     
     layer.forEach(l => {
-        l.style.width = `${SCALE * 320}px`;
-        l.style.height = `${SCALE * 180}px`;
+        l.style.width = `${SCALE * SCREEN_WIDTH}px`;
+        l.style.height = `${SCALE * SCREEN_HEIGHT}px`;
     });
 }
 
