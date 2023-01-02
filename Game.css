@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "Earthbound";
+    src: url("sprites/orange kid.ttf");
+}
+
 body {
     margin: 0;
     background: #222
