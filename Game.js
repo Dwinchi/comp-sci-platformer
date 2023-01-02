@@ -40,6 +40,7 @@ export let GC = {
     music: "",
     level: null,
     gameMode: 0,
+    back: null,
     obj: {
         /*
         * me = menu
@@ -95,7 +96,11 @@ function update() {
         for (const i of GC.obj.me) { i.update(); }
     }
 
-    if (GC.state == 10) {
+    if (GC.state == 20) {
+        
+    }
+
+    if (GC.state == 50) {
         // Gameplay state
         for (const i of GC.obj.en) { i.update(); }
         for (const i of GC.obj.se) { i.update(); }
@@ -269,7 +274,7 @@ document.addEventListener("keydown", function(e) { changeKey(e.key, 1) });
 document.addEventListener("keyup", function(e) { changeKey(e.key, 0) });
 window.addEventListener("resize", resize);
 
-export function Transition(state) {
+export function Transition(state, back) {
     GC.state = state;
 
     while (GC.obj.me.length != 0) { GC.obj.me.shift(); }
@@ -277,6 +282,7 @@ export function Transition(state) {
     while (GC.obj.se.length != 0) { GC.obj.se.shift(); }
 
     p = new Player(10,10);
+    GC.back = back;
     GC.level = "l1-1";
 }
 
