@@ -138,6 +138,6 @@ export class Settings {
             drawText(this.txt[2], this.x + 76, this.y + 4, 12);
         } else { drawText(this.txt[2], this.x + 76, this.y + 4, 7); }
 
-        drawText("Press BACKSPACE to exit", this.x + 2, this.y + 76, 7);
+        drawText("Press ENTER to exit", this.x + 2, this.y + 76, 7);
     }
 }

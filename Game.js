@@ -42,7 +42,7 @@ export let keys = [
     "a",
     "d",
     "shift",
-    "backspace",
+    "enter",
     "e",
     " ",
 ]
