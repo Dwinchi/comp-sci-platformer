@@ -32,31 +32,20 @@ export let CLRS = [
     "#FFCCAA"
 ]
 
+
+let SCREEN_HEIGHT = 180;
+let SCREEN_WIDTH = 320;
+
 export let keys = [
     "w",
     "s",
     "a",
     "d",
     "shift",
-    "tab",
+    "backspace",
     "e",
     " ",
 ]
-
-let SCREEN_HEIGHT = 180;
-let SCREEN_WIDTH = 320;
-
-/* 
-? Input button index
-* 0 = up
-* 1 = down
-* 2 = left
-* 3 = right
-* 4 = shift
-* 5 = tab
-* 6 = e
-* 7 = space
-*/
 
 export let BTN = [0,0,0,0,0,0,0,0];
 export let AXIS = [0,0];
@@ -65,7 +54,7 @@ let p;
 
 // Short for Game Controller
 export let GC = {
-    state: 0,
+    state: 1,
     music: "",
     level: null,
     gameMode: 0,
@@ -113,12 +102,27 @@ export let settings = null;
 
 function startTimer() {
     resize();
-    load(20);
+    load(GC.state);
     TIMER = setInterval(update, (1000/60));
 }
 
+export function Transition(state, back) {
+    back = back || null;
+    GC.back = back;
+
+    if (state != 20) {
+        while (GC.obj.me.length != 0) { GC.obj.me.shift(); }
+        while (GC.obj.en.length != 0) { GC.obj.en.shift(); }
+        while (GC.obj.se.length != 0) { GC.obj.se.shift(); }
+    }
+
+    load(state);
+}
+
 function load(state) {
-    if (state == 0) {
+    GC.state = state;
+
+    if (state == 1) {
         menu = new MainMenu(20, 20, 280, 132);
     } if (state == 20) {
         settings = new Settings();
@@ -131,18 +135,17 @@ function load(state) {
 function update() {
     tick();
 
-    if (GC.state == 0) {
+    if (GC.state == 1) {
         for (const i of GC.obj.me) { i.update(); }
     }
 
     if (GC.state == 20) {
-        
+        for (const i of GC.obj.se) { i.update(); }
     }
 
     if (GC.state == 50) {
         // Gameplay state
         for (const i of GC.obj.en) { i.update(); }
-        for (const i of GC.obj.se) { i.update(); }
 
         Camera(p);
     }
@@ -302,20 +305,6 @@ document.addEventListener("keydown", function(e) { changeKey(e.key, 1) });
 document.addEventListener("keyup", function(e) { changeKey(e.key, 0) });
 window.addEventListener("resize", resize);
 
-export function Transition(state, back) {
-    GC.state = state;
-    GC.back = back;
-
-    while (GC.obj.me.length != 0) { GC.obj.me.shift(); }
-    while (GC.obj.en.length != 0) { GC.obj.en.shift(); }
-    while (GC.obj.se.length != 0) { GC.obj.se.shift(); }
-
-
-    load(state);
-    //p = new Player(10,10);
-    //GC.level = "l1-1";
-}
-
 function resize() {
     let winW = Math.floor(window.innerHeight / SCREEN_HEIGHT);
     let winH = Math.floor(window.innerWidth / SCREEN_WIDTH);
@@ -347,7 +336,7 @@ export function drawText(text, x, y, clr) {
         let char = text.charAt(i);
         
         if (char != " ") {
-            ctxUI.drawImage(fontImg, DEFAULT_STRING.indexOf(char) * 4, 0, 4, 5, x + (i * 4), y, 4, 5);
+            ctxEntity.drawImage(fontImg, DEFAULT_STRING.indexOf(char) * 4, 0, 4, 5, x + (i * 4), y, 4, 5);
         }
     }
 

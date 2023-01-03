@@ -1,8 +1,8 @@
 import { Clamp, Touching } from './Util.js';
-import { Physics, Cam, GC, BTN, AXIS } from "./Game.js";
+import { Physics, Cam, GC, BTN, AXIS, Transition } from "./Game.js";
 
 export class Player {
-    constructor(x, y ) {
+    constructor(x, y) {
         this.x = x;
         this.y = y;
         this.w = 7;
@@ -31,6 +31,15 @@ export class Player {
     }
 
     update() {
+        /* -------------------------------------------------------------------------- */
+        /*                                  Settings                                  */
+        /* -------------------------------------------------------------------------- */
+        if (BTN[5]>0) {
+            Transition(20,50);
+            BTN[5] = -1;
+        }
+
+
         /* -------------------------------------------------------------------------- */
         /*                               Player movement                              */
         /* -------------------------------------------------------------------------- */

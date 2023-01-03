@@ -36,7 +36,7 @@ export class MainMenu {
                 Transition(50);
             } else if (this.selected == 1) {
                 BTN[7] = -1;
-                Transition(20,"Main menu");
+                Transition(20,1);
             }
         }
     }
@@ -68,7 +68,7 @@ export class MenuBtn {
         GC.obj.me.push(this);
     }
 
-    update() { }
+    update() {}
 
     draw(ctx) {
         if (menu.selected == this.index) {
@@ -95,20 +95,49 @@ export class Settings {
             "Input"
         ]
 
-        GC.obj.me.push(this);
+        GC.obj.se.push(this);
     }
 
-    update() { }
+    update() { 
+        if (BTN[2]>0) { this.xSelect--; BTN[2] = -1; }
+        if (BTN[3]>0) { this.xSelect++; BTN[3] = -1; }
+
+        if (this.xSelect < 0) { this.xSelect = 2; }
+        if (this.xSelect > 2) { this.xSelect = 0; }
+
+        if (BTN[5]>0) {
+            BTN[5] = -1;
+            if (GC.back == 50) {
+                while (GC.obj.se.length != 0) { GC.obj.se.shift(); }
+                GC.state = 50;
+            } else { Transition(GC.back); }
+        }
+    }
 
     draw(ctx) {
         let img = document.getElementById("settings");
         ctx.drawImage(img,this.x,this.y);
 
-        drawText(keys[2], this.x + 3, this.y + 4, 7);
-        drawText(keys[3], this.x + 105, this.y + 4, 7);
+        if (BTN[2]>0 || BTN[2]<0) {
+            drawText(keys[2], this.x + 3, this.y + 4, 12);
+        } else { drawText(keys[2], this.x + 3, this.y + 4, 7); }
 
-        drawText(this.txt[0], this.x + 16, this.y + 4, 7);
-        drawText(this.txt[1], this.x + 42, this.y + 4, 7);
-        drawText(this.txt[2], this.x + 76, this.y + 4, 7);
+        if (BTN[3]>0 || BTN[3]<0) {
+            drawText(keys[3], this.x + 105, this.y + 4, 12);
+        } else { drawText(keys[3], this.x + 105, this.y + 4, 7); }
+
+        if (this.xSelect == 0) {
+            drawText(this.txt[0], this.x + 16, this.y + 4, 12);
+        } else { drawText(this.txt[0], this.x + 16, this.y + 4, 7); }
+
+        if (this.xSelect == 1) {
+            drawText(this.txt[1], this.x + 42, this.y + 4, 12);
+        } else { drawText(this.txt[1], this.x + 42, this.y + 4, 7); }
+
+        if (this.xSelect == 2) {
+            drawText(this.txt[2], this.x + 76, this.y + 4, 12);
+        } else { drawText(this.txt[2], this.x + 76, this.y + 4, 7); }
+
+        drawText("Press BACKSPACE to exit", this.x + 2, this.y + 76, 7);
     }
 }
