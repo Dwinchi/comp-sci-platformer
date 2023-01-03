@@ -3,7 +3,7 @@ console.clear();
 import * as level from "./levels/1-1/1-1.json" assert { type: "json" };
 import { Lerp, Clamp } from './Util.js';
 import { Player } from "./Player.js";
-import { MainMenu } from "./Menu.js";
+import { MainMenu, Settings } from "./Menu.js";
 let LAYERS = level.default.layers;
 
 export let Physics = {
@@ -13,6 +13,35 @@ export let Physics = {
     maxSpd: 2000,
     jumpSpd: -3500,
 }
+
+export let CLRS = [
+    "#000000",
+    "#1d2b53",
+    "#008751",
+    "#AB5236",
+    "#5F574F",
+    "#C2C3C7",
+    "#FFF1E8",
+    "#FF004D",
+    "#FFA300",
+    "#FFEC27",
+    "#00E436",
+    "#29ADFF",
+    "#83769C",
+    "#FF77A8",
+    "#FFCCAA"
+]
+
+export let keys = [
+    "w",
+    "s",
+    "a",
+    "d",
+    "shift",
+    "tab",
+    "e",
+    " ",
+]
 
 let SCREEN_HEIGHT = 180;
 let SCREEN_WIDTH = 320;
@@ -78,21 +107,31 @@ let ctxEntity = cEntity.getContext("2d");
 let ctxScreen = cScreen.getContext("2d");
 
 export let menu = null;
+export let settings = null;
 
 //let p = new Player(10,10);
 
 function startTimer() {
     resize();
+    load(20);
     TIMER = setInterval(update, (1000/60));
+}
+
+function load(state) {
+    if (state == 0) {
+        menu = new MainMenu(20, 20, 280, 132);
+    } if (state == 20) {
+        settings = new Settings();
+    } if (state == 50) {
+        p = new Player(10,10);
+        GC.level = "l1-1";
+    }
 }
 
 function update() {
     tick();
 
     if (GC.state == 0) {
-        // Main menu state
-        if (menu == null) { menu = new MainMenu(20, 20, 280, 132); }
-
         for (const i of GC.obj.me) { i.update(); }
     }
 
@@ -232,17 +271,6 @@ function draw() {
 function changeKey(key, state) {
     let k = key.toLowerCase();
 
-    let keys = [
-        "w",
-        "s",
-        "a",
-        "d",
-        "shift",
-        "tab",
-        "e",
-        " ",
-    ]
-
     for (let i = 0; i < keys.length; i++) {
         if (k == keys[i] &&
             (BTN[i] == 0 ||
@@ -276,14 +304,16 @@ window.addEventListener("resize", resize);
 
 export function Transition(state, back) {
     GC.state = state;
+    GC.back = back;
 
     while (GC.obj.me.length != 0) { GC.obj.me.shift(); }
     while (GC.obj.en.length != 0) { GC.obj.en.shift(); }
     while (GC.obj.se.length != 0) { GC.obj.se.shift(); }
 
-    p = new Player(10,10);
-    GC.back = back;
-    GC.level = "l1-1";
+
+    load(state);
+    //p = new Player(10,10);
+    //GC.level = "l1-1";
 }
 
 function resize() {
@@ -309,10 +339,10 @@ function tick() {
     }
 }
 
-export function drawText(text, x, y, color) {
-    color = color || 0;
+export function drawText(text, x, y, clr) {
+    clr = clr || 0;
+    let fontImg = document.getElementById(`mainfont-${clr}`);
 
-    let fontImg = document.getElementById("font");
     for (let i = 0; i < text.length; i++) {
         let char = text.charAt(i);
         

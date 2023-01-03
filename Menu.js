@@ -1,4 +1,4 @@
-import { drawText, GC, menu, BTN, AXIS, Transition } from "./Game.js";
+import { drawText, GC, menu, BTN, AXIS, Transition, keys } from "./Game.js";
 
 export class MainMenu {
     constructor(x, y , width, height) {
@@ -76,6 +76,39 @@ export class MenuBtn {
             ctx.fillRect(this.x - 6, this.y + 2, 4, 1);
             ctx.fillRect(this.x + (this.txt.length*4) + 3, this.y + 2, 4, 1);
         }
-        drawText(this.txt, this.x, this.y, "#000000");
+        drawText(this.txt, this.x, this.y, 0);
+    }
+}
+
+export class Settings {
+    constructor() {
+        this.w = 113;
+        this.h = 84;
+        this.x = 160 - Math.floor(this.w / 2);
+        this.y = 90 - Math.floor(this.h / 2);
+        this.xSelect = 0;
+        this.ySelect = 0;
+
+        this.txt = [
+            "Audio",
+            "Display",
+            "Input"
+        ]
+
+        GC.obj.me.push(this);
+    }
+
+    update() { }
+
+    draw(ctx) {
+        let img = document.getElementById("settings");
+        ctx.drawImage(img,this.x,this.y);
+
+        drawText(keys[2], this.x + 3, this.y + 4, 7);
+        drawText(keys[3], this.x + 105, this.y + 4, 7);
+
+        drawText(this.txt[0], this.x + 16, this.y + 4, 7);
+        drawText(this.txt[1], this.x + 42, this.y + 4, 7);
+        drawText(this.txt[2], this.x + 76, this.y + 4, 7);
     }
 }
