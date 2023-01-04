@@ -1,12 +1,12 @@
 import { Clamp, Touching } from './Util.js';
-import { Physics, Cam } from "./Game.js";
+import { Physics, Cam, GC, BTN, AXIS, Transition } from "./Game.js";
 
 export class Player {
-    constructor(x, y , w, h) {
+    constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.w = w;
-        this.h = h;
+        this.w = 7;
+        this.h = 7;
         this.xSpd = 0;
         this.ySpd = 0;
         this.img = document.getElementById("player-img");
@@ -26,11 +26,20 @@ export class Player {
         this.arrows = [0,0,0];
         this.canFire = false;
         this.power = false;
-        this.BTN = [0,0,0,0,0,0,0,0];
-        this.AXIS = [0,0];
+
+        GC.obj.en.push(this);
     }
 
     update() {
+        /* -------------------------------------------------------------------------- */
+        /*                                  Settings                                  */
+        /* -------------------------------------------------------------------------- */
+        if (BTN[5]>0) {
+            Transition(20,50);
+            BTN[5] = -1;
+        }
+
+
         /* -------------------------------------------------------------------------- */
         /*                               Player movement                              */
         /* -------------------------------------------------------------------------- */
@@ -39,10 +48,10 @@ export class Player {
         
         if (!this.wallJumpDelay) {
             // Accelerate
-            if (this.AXIS[1]) { this.xSpd += (Physics.accel*this.AXIS[1]); }
+            if (AXIS[1]) { this.xSpd += (Physics.accel*AXIS[1]); }
             
             // Deccelerate
-            if (!this.AXIS[1]) {
+            if (!AXIS[1]) {
                 if ((this.xSpd > 0 && this.xSpd - (Physics.deccel * Math.sign(this.xSpd)) < 0) ||
                 (this.xSpd < 0 && this.xSpd - (Physics.deccel * Math.sign(this.xSpd)) > 0)) {
                     this.xSpd = 0;
@@ -56,17 +65,17 @@ export class Player {
         this.isOnWall = Touching(this, this.x + (1 * Math.sign(this.xSpd)), this.y, "x");
         
         // Wall jump
-        if (this.isOnWall && !this.isOnGround && this.BTN[7]) {
+        if (this.isOnWall && !this.isOnGround && BTN[7]>0) {
             this.wallJumpDelay = 3;
             this.isOnWall = 0;
             this.xSpd = -Math.sign(this.xSpd) * Physics.maxSpd;
             this.ySpd = Physics.jumpSpd;
-            this.BTN[7] = 0;
+            BTN[7] = -1;
         }
         // Jump
-        if (this.BTN[7] && this.isOnGround) {
+        if (BTN[7]>0 && this.isOnGround) {
             this.ySpd = Physics.jumpSpd;
-            this.BTN[7] = 0;
+            BTN[7] = -1;
         }
         
         if (this.isOnWall) { this.xSpd = 0; }
@@ -91,6 +100,8 @@ export class Player {
             this.ySpd = 0;
         }
         this.y += (this.ySpd / 1000);
+
+        //console.log(BTN, AXIS);
 
         /* -------------------------------------------------------------------------- */
         /*                                  ANIMATION                                 */

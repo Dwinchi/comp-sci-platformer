@@ -3,34 +3,8 @@ console.clear();
 import * as level from "./levels/1-1/1-1.json" assert { type: "json" };
 import { Lerp, Clamp } from './Util.js';
 import { Player } from "./Player.js";
+import { MainMenu, Settings } from "./Menu.js";
 let LAYERS = level.default.layers;
-
-let SCREEN_HEIGHT = 180;
-let SCREEN_WIDTH = 320;
-
-// Initialize variables
-/* 
-* 0 = up
-* 1 = down
-* 2 = left
-* 3 = right
-* 4 = shift
-* 5 = tab
-* 6 = e
-* 7 = space
-* 8 = j
-*/
-
-// Short for Game Controller
-let GC = {
-    state: 0,
-    music: "",
-    level: 0,
-    gameMode: 0,
-}
-
-GC.level = "1-1";
-
 
 export let Physics = {
     grav: 200,
@@ -39,6 +13,66 @@ export let Physics = {
     maxSpd: 2000,
     jumpSpd: -3500,
 }
+
+export let CLRS = [
+    "#000000",
+    "#1d2b53",
+    "#008751",
+    "#AB5236",
+    "#5F574F",
+    "#C2C3C7",
+    "#FFF1E8",
+    "#FF004D",
+    "#FFA300",
+    "#FFEC27",
+    "#00E436",
+    "#29ADFF",
+    "#83769C",
+    "#FF77A8",
+    "#FFCCAA"
+]
+
+let SCREEN_HEIGHT = 180;
+let SCREEN_WIDTH = 320;
+
+export let keys = [
+    "arrowup",
+    "arrowdown",
+    "arrowleft",
+    "arrowright",
+    "shift",
+    "enter",
+    "e",
+    "c",
+]
+
+export let BTN = [0,0,0,0,0,0,0,0];
+export let AXIS = [0,0];
+
+let p;
+
+// Short for Game Controller
+export let GC = {
+    state: 1,
+    music: "",
+    level: null,
+    gameMode: 0,
+    back: null,
+    obj: {
+        /*
+        * me = menu
+        * se = settings
+        * en = entities
+        */
+        me: [],
+        se: [],
+        en: []
+    }
+}
+
+/* GC.level = "1-1"; */
+
+let DEFAULT_STRING = ` !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[/]^_abcdefghijklmnopqrstuvwxyz{|}~`;
 
 let TIMER;
 var fps = document.getElementById("fps");
@@ -52,9 +86,6 @@ export let Cam = {
     img: null,
 }
 
-let BTN = [0,0,0,0,0,0,0,0];
-let AXIS = [0,0];
-
 const cUI = document.getElementById("ui-layer");
 const cEntity = document.getElementById("entity-layer");
 const cScreen = document.getElementById("screen-layer");
@@ -63,20 +94,62 @@ let ctxUI = cUI.getContext("2d");
 let ctxEntity = cEntity.getContext("2d");
 let ctxScreen = cScreen.getContext("2d");
 
-const p = new Player(10,10,7,7);
+export let menu = null;
+export let settings = null;
+
+//let p = new Player(10,10);
 
 function startTimer() {
     resize();
+    load(GC.state);
     TIMER = setInterval(update, (1000/60));
+}
+
+export function Transition(state, back) {
+    back = back || null;
+    GC.back = back;
+
+    if (state != 20) {
+        while (GC.obj.me.length != 0) { GC.obj.me.shift(); }
+        while (GC.obj.en.length != 0) { GC.obj.en.shift(); }
+        while (GC.obj.se.length != 0) { GC.obj.se.shift(); }
+    }
+
+    load(state);
+}
+
+function load(state) {
+    GC.state = state;
+
+    if (state == 1) {
+        menu = new MainMenu(20, 20, 280, 132);
+    } if (state == 20) {
+        settings = new Settings();
+    } if (state == 50) {
+        p = new Player(10,10);
+        GC.level = "l1-1";
+    }
 }
 
 function update() {
     tick();
 
-    p.BTN = BTN;
-    p.AXIS = AXIS;
+    if (GC.state == 1) {
+        for (const i of GC.obj.me) { i.update(); }
+    }
 
-    p.update()
+    if (GC.state == 20) {
+        for (const i of GC.obj.se) { i.update(); }
+    }
+
+    if (GC.state == 50) {
+        // Gameplay state
+        for (const i of GC.obj.en) { i.update(); }
+
+        Camera(p);
+    }
+    
+    draw();
     
     /* -------------------------------------------------------------------------- */
     /*                                   POWERS                                   */
@@ -96,18 +169,9 @@ function update() {
         movearrows()
     } */
 
-    
-    /* -------------------------------------------------------------------------- */
-    /*                                   CAMERA                                   */
-    /* -------------------------------------------------------------------------- */
-
-    Camera(p);
-
-    draw();
-
     function Camera(obj) { 
         //* Camera follows object
-        Cam.img = document.getElementById("l1-1")
+        Cam.img = document.getElementById(GC.level)
 
         if (LAYERS[1].gridCellsX > Math.ceil(SCREEN_WIDTH / 8)) {
             Cam.fxPos = obj.x - (SCREEN_WIDTH / 2) - 4;
@@ -197,42 +261,41 @@ function draw() {
     ctxScreen.clearRect(0, 0, cScreen.width, cScreen.height);
     ctxUI.clearRect(0, 0, cEntity.width, cEntity.height);
 
-    p.draw(ctxEntity);
+    if (GC.level != null) {
+        ctxScreen.drawImage(Cam.img,Cam.x,Cam.y,320,180,0,0,320,180);
+    }
 
-    ctxScreen.drawImage(Cam.img,Cam.x,Cam.y,320,180,0,0,320,180);
+    for (const i of GC.obj.me) { i.draw(ctxEntity); }
+    for (const i of GC.obj.en) { i.draw(ctxEntity); }
+    for (const i of GC.obj.se) { i.draw(ctxEntity); }
 }
 
 function changeKey(key, state) {
     let k = key.toLowerCase();
-    let s;
-    
-    if (state) { s = 1 }
-    else if (!state) { s = 0; }
-    
-    if (k == "w") { BTN[0] = s; }
-    if (k == "s") { BTN[1] = s; }
-    if (k == "a") { BTN[2] = s; }
-    if (k == "d") { BTN[3] = s; }
-    if (k == "shift") { BTN[4] = s; }
-    if (k == "tab") { BTN[5] = s; }
-    if (k == "e") { BTN[6] = s; }
-    if (k == " ") { BTN[7] = s; }
-    if (k == "j") { BTN[8] = s; }
+
+    for (let i = 0; i < keys.length; i++) {
+        if (k == keys[i] &&
+            (BTN[i] == 0 ||
+            BTN[i] == 1 ||
+            (BTN[i] == -1 && state == 0))) {
+            BTN[i] = state;
+        }
+    }
     
     // Set axis
-    if (BTN[0] && !BTN[1]) {
+    if (BTN[0]>0 && !BTN[1]) {
         AXIS[0] = -1;
-    } else if (!BTN[0] && BTN[1]) {
+    } else if (!BTN[0] && BTN[1]>0) {
         AXIS[0] = 1;
-    } else if ((!BTN[0] && !BTN[1]) || (BTN[0] && BTN[1])) {
+    } else if ((!BTN[0] && !BTN[1]) || (BTN[0]>0 && BTN[1]>0)) {
         AXIS[0] = 0;
     }
     
-    if (BTN[2] && !BTN[3]) {
+    if (BTN[2]>0 && !BTN[3]) {
         AXIS[1] = -1;
-    } else if (!BTN[2] && BTN[3]) {
+    } else if (!BTN[2] && BTN[3]>0) {
         AXIS[1] = 1;
-    } else if ((!BTN[2] && !BTN[3]) || (BTN[2] && BTN[3])) {
+    } else if ((!BTN[2] && !BTN[3]) || (BTN[2]>0 && BTN[3]>0)) {
         AXIS[1] = 0;
     }
 }
@@ -262,6 +325,24 @@ function tick() {
         startTime = time;
         frame = 0;
     }
+}
+
+export function drawText(text, x, y, clr) {
+    clr = clr || 0;
+    let fontImg = document.getElementById(`mainfont-${clr}`);
+
+    for (let i = 0; i < text.length; i++) {
+        let char = text.charAt(i);
+        
+        if (char != " ") {
+            ctxEntity.drawImage(fontImg, DEFAULT_STRING.indexOf(char) * 4, 0, 4, 5, x + (i * 4), y, 4, 5);
+        }
+    }
+
+    /* ctxUI.font = '14px Earthbound';
+    ctxUI.fillStyle = color;
+    ctxUI.textBaseline = 'top';
+    ctxUI.fillText(text, x, y); */
 }
 
 window.onload = startTimer();
