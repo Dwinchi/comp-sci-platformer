@@ -116,15 +116,19 @@ export class Settings {
 
     draw(ctx) {
         let img = document.getElementById("settings");
-        ctx.drawImage(img,this.x,this.y);
+        ctx.drawImage(img,0,0);
+        let k1
+        if (keys[2] == "arrowleft") {
+            k1 = "<"
+        } else k1 = keys[2]
 
         if (BTN[2]>0 || BTN[2]<0) {
-            drawText(keys[2], this.x + 3, this.y + 4, 12);
-        } else { drawText(keys[2], this.x + 3, this.y + 4, 7); }
+            drawText(this.keycheck(keys[2]), this.x + 3, this.y + 4, 12);
+        } else { drawText(this.keycheck(keys[2]), this.x + 3, this.y + 4, 7); }
 
         if (BTN[3]>0 || BTN[3]<0) {
-            drawText(keys[3], this.x + 105, this.y + 4, 12);
-        } else { drawText(keys[3], this.x + 105, this.y + 4, 7); }
+            drawText(this.keycheck(keys[3]), this.x + 105, this.y + 4, 12);
+        } else { drawText(this.keycheck(keys[3]), this.x + 105, this.y + 4, 7); }
 
         if (this.xSelect == 0) {
             drawText(this.txt[0], this.x + 16, this.y + 4, 12);
@@ -139,5 +143,16 @@ export class Settings {
         } else { drawText(this.txt[2], this.x + 76, this.y + 4, 7); }
 
         drawText("Press ENTER to exit", this.x + 2, this.y + 76, 7);
+    }
+
+    keycheck(key) {
+        let k
+        if (key == "arrowleft") {
+            k = "<";
+        } else if (key == "arrowright") {
+            k = ">";
+        } else k = key;
+        k = k.toUpperCase();
+        return k;
     }
 }

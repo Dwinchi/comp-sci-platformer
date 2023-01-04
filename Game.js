@@ -32,19 +32,18 @@ export let CLRS = [
     "#FFCCAA"
 ]
 
-
 let SCREEN_HEIGHT = 180;
 let SCREEN_WIDTH = 320;
 
 export let keys = [
-    "w",
-    "s",
-    "a",
-    "d",
+    "arrowup",
+    "arrowdown",
+    "arrowleft",
+    "arrowright",
     "shift",
     "enter",
     "e",
-    " ",
+    "c",
 ]
 
 export let BTN = [0,0,0,0,0,0,0,0];
