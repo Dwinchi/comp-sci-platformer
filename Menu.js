@@ -11,9 +11,9 @@ export class MainMenu {
         this.selected = 0;
         
         this.btns = [0,0,0];
-        this.btns[0] = new MenuBtn(0,160 - 10,120 + 2 + (0 * 8),"Start");
-        this.btns[1] = new MenuBtn(1,160 - 16,120 + 2 + (1 * 8),"Settings");
-        this.btns[2] = new MenuBtn(2,160 - 8,120 + 2 + (2 * 8),"Exit");
+        this.btns[0] = new MenuBtn(0,128 - 10,100 + 2 + (0 * 8),"Start");
+        this.btns[1] = new MenuBtn(1,128 - 16,100 + 2 + (1 * 8),"Settings");
+        this.btns[2] = new MenuBtn(2,128 - 8,100 + 2 + (2 * 8),"Exit");
         
         this.btns[0].selected = 1;
 
@@ -51,7 +51,7 @@ export class MainMenu {
         ctx.lineWidth = 2;
         ctx.strokeRect(this.x,this.y, this.width, this.height);
         let logo = document.getElementById("logo");
-        ctx.drawImage(logo,116,50);
+        ctx.drawImage(logo,83,50);
     }
 }
 
@@ -84,8 +84,8 @@ export class Settings {
     constructor() {
         this.w = 113;
         this.h = 84;
-        this.x = 160 - Math.floor(this.w / 2);
-        this.y = 90 - Math.floor(this.h / 2);
+        this.x = 128 - Math.floor(this.w / 2);
+        this.y = 72 - Math.floor(this.h / 2);
         this.xSelect = 0;
         this.ySelect = 0;
 

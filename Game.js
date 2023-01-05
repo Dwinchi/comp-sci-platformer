@@ -1,10 +1,9 @@
 console.clear();
 
-import * as level from "./levels/1-1/1-1.json" assert { type: "json" };
+//import * as level from "./levels/1-2/level.json" assert { type: "json" };
 import { Lerp, Clamp } from './Util.js';
 import { Player } from "./Player.js";
 import { MainMenu, Settings } from "./Menu.js";
-let LAYERS = level.default.layers;
 
 export let Physics = {
     grav: 200,
@@ -32,8 +31,8 @@ export let CLRS = [
     "#FFCCAA"
 ]
 
-let SCREEN_HEIGHT = 180;
-let SCREEN_WIDTH = 320;
+let SCREEN_HEIGHT = 144;
+let SCREEN_WIDTH = 256;
 
 export let keys = [
     "arrowup",
@@ -55,6 +54,7 @@ let p;
 export let GC = {
     state: 1,
     music: "",
+    levelID: "Level_2",
     level: null,
     gameMode: 0,
     back: null,
@@ -122,12 +122,13 @@ function load(state) {
     GC.state = state;
 
     if (state == 1) {
-        menu = new MainMenu(20, 20, 280, 132);
+        menu = new MainMenu(20, 10, 216, 124);
     } if (state == 20) {
         settings = new Settings();
     } if (state == 50) {
-        p = new Player(10,10);
-        GC.level = "l1-1";
+        GC.level = JSON.parse(Get(`./levels/World1/simplified/${GC.levelID}/data.json`));
+        GC.level.data = JSON.parse("[" + Get(`./levels/World1/simplified/${GC.levelID}/IntGrid.csv`) + "]");
+        p = new Player(GC.level.entities.Player[0].x,GC.level.entities.Player[0].y);
     }
 }
 
@@ -148,108 +149,24 @@ function update() {
 
         Camera(p);
     }
-    
-    draw();
-    
-    /* -------------------------------------------------------------------------- */
-    /*                                   POWERS                                   */
-    /* -------------------------------------------------------------------------- */
-    // If player has bow
-    /* if (p.power == 1) {
-        p.canFire = true;
-    }
-    
-    // If player has bow
-    if (bowPwr) {
-        canFire = true;
-    }
 
-    // Firing bow 
-    if (p.canFire) {
-        movearrows()
-    } */
+    draw();
 
     function Camera(obj) { 
         //* Camera follows object
-        Cam.img = document.getElementById(GC.level)
+        Cam.img = document.getElementById(GC.level.identifier);
 
-        if (LAYERS[1].gridCellsX > Math.ceil(SCREEN_WIDTH / 8)) {
+        if (GC.level.width > SCREEN_WIDTH) {
             Cam.fxPos = obj.x - (SCREEN_WIDTH / 2) - 4;
             Cam.x = Lerp(Cam.x, Cam.fxPos, 0.1);
-            Cam.x = Clamp(Cam.x, 0, (LAYERS[1].gridCellsX * 8) - SCREEN_WIDTH);
+            Cam.x = Clamp(Cam.x, 0, GC.level.width - SCREEN_WIDTH);
         }
-        if (LAYERS[1].gridCellsY > Math.ceil(SCREEN_HEIGHT / 8)) {
+        if (GC.level.height > SCREEN_HEIGHT) {
             Cam.fyPos = obj.y - (SCREEN_HEIGHT / 2) - 4;
             Cam.y = Lerp(Cam.y, Cam.fyPos, 0.1);
-            Cam.y = Clamp(Cam.y, 0, (LAYERS[1].gridCellsY * 8) - SCREEN_HEIGHT);
+            Cam.y = Clamp(Cam.y, 0, GC.level.height - SCREEN_HEIGHT);
         }
     }
-
-    /* function movearrows() {
-        for (let arrow of p.arrows) {
-            // Shoot arrow
-            if (!arrow && BTN[6]) {
-                p.arrows[p.arrows.indexOf(arrow)] = {
-                    x: p.w,
-                    y: p.h,
-                    dir: p.dir
-                };
-                
-                BTN[6] = 0;
-            }
-        
-            // Move arrows
-            if (arrow) {
-                let x = arrow.x;
-                let y = arrow.y;
-                let dir = arrow.dir;
-                let spd = 6;
-        
-                if (dir == 0) {
-                    y -= spd;
-                } else if (dir == 4) {
-                    y += spd;
-                } else if (dir == 2) {
-                    x += spd;
-                } else if (dir == 6) {
-                    x -= spd;
-                } else if (dir == 1) {
-                    x += (spd / 2);
-                    y -= (spd / 2);
-                } else if (dir == 5) {
-                    x -= (spd / 2);
-                    y += (spd / 2);
-                } else if (dir == 3) {
-                    x += (spd / 2);
-                    y += (spd / 2);
-                } else if (dir == 7) {
-                    x -= (spd / 2);
-                    y -= (spd / 2);
-                }
-                
-                // Set movement and angle
-                let b = document.getElementById(`shot${p.arrows.indexOf(arrow)}`).style;
-                b.left = `${x}px`;
-                b.top = `${y}px`;
-                
-                arrow.x = x;
-                arrow.y = y;
-                
-                // Checking if arrow is out of the screen
-                if (arrow.x > window.innerWidth || arrow.y > window.innerHeight || arrow.x < 0 || arrow.y < 0) {
-                    p.arrows[p.arrows.indexOf(arrow)] = 0;
-                    b.left = `${-50}px`;
-                    b.top = `${-50}px`;
-                }
-        
-                if ((p.x < arrow.x + 50) && (p.x + 50 < arrow.x) && (p.y < arrow.y + 50) && (p.y + 50 > arrow.y)) {}
-        
-                // Checking if arrow hits opponent and removing it
-                
-            
-            }
-        }
-    } */
 }
 
 function draw() {
@@ -261,9 +178,7 @@ function draw() {
     ctxScreen.clearRect(0, 0, cScreen.width, cScreen.height);
     ctxUI.clearRect(0, 0, cEntity.width, cEntity.height);
 
-    if (GC.level != null) {
-        ctxScreen.drawImage(Cam.img,Cam.x,Cam.y,320,180,0,0,320,180);
-    }
+    if (GC.level != null) { ctxScreen.drawImage(Cam.img,Cam.x,Cam.y,SCREEN_WIDTH,SCREEN_HEIGHT,0,0,SCREEN_WIDTH,SCREEN_HEIGHT); }
 
     for (const i of GC.obj.me) { i.draw(ctxEntity); }
     for (const i of GC.obj.en) { i.draw(ctxEntity); }
@@ -338,11 +253,13 @@ export function drawText(text, x, y, clr) {
             ctxEntity.drawImage(fontImg, DEFAULT_STRING.indexOf(char) * 4, 0, 4, 5, x + (i * 4), y, 4, 5);
         }
     }
+}
 
-    /* ctxUI.font = '14px Earthbound';
-    ctxUI.fillStyle = color;
-    ctxUI.textBaseline = 'top';
-    ctxUI.fillText(text, x, y); */
+function Get(yourUrl){
+    var Httpreq = new XMLHttpRequest(); // a new request
+    Httpreq.open("GET",yourUrl,false);
+    Httpreq.send(null);
+    return Httpreq.responseText;          
 }
 
 window.onload = startTimer();

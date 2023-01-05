@@ -1,5 +1,4 @@
-import * as level from "./levels/1-1/1-1.json" assert { type: "json" };
-let LAYERS = level.default.layers;
+import { GC } from "./Game.js";
 
 let TS = {
     x: 11,
@@ -28,7 +27,7 @@ export function Touching(obj, x, y, dir) {
     let t2;
     let t3;
     
-    let l = LAYERS[0];
+    let l = GC.level;
 
     if (dir == "x") {
         x1 = Math.floor(x / 8);
@@ -42,10 +41,12 @@ export function Touching(obj, x, y, dir) {
         y2 = Math.floor((y + obj.h) / 8);
     }
 
-    t0 = TS.tiles[l.data[x1 + (y1 * l.gridCellsX)]];
-    t1 = TS.tiles[l.data[x2 + (y1 * l.gridCellsX)]];
-    t2 = TS.tiles[l.data[x1 + (y2 * l.gridCellsX)]];
-    t3 = TS.tiles[l.data[x2 + (y2 * l.gridCellsX)]];
+    t0 = l.data[x1 + (y1 * (l.width / 8))];
+    t1 = l.data[x2 + (y1 * (l.width / 8))];
+    t2 = l.data[x1 + (y2 * (l.width / 8))];
+    t3 = l.data[x2 + (y2 * (l.width / 8))];
+
+    console.log(t0,t1,t2,t3);
 
     // Vertical
     if (t1 == 1 || t0 == 1) {

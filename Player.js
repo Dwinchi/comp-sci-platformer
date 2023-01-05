@@ -39,7 +39,6 @@ export class Player {
             BTN[5] = -1;
         }
 
-
         /* -------------------------------------------------------------------------- */
         /*                               Player movement                              */
         /* -------------------------------------------------------------------------- */
@@ -136,6 +135,90 @@ export class Player {
 
 
         if (this.isOnWall && !this.isOnGround) { this.si = 5; }
+    
+        /* -------------------------------------------------------------------------- */
+    /*                                   POWERS                                   */
+    /* -------------------------------------------------------------------------- */
+    // If player has bow
+    /* if (this.power == 1) {
+        this.canFire = true;
+    }
+    
+    // If player has bow
+    if (bowPwr) {
+        canFire = true;
+    }
+
+    // Firing bow 
+    if (this.canFire) {
+        movearrows()
+    } */
+
+    /* function movearrows() {
+        for (let arrow of this.arrows) {
+            // Shoot arrow
+            if (!arrow && BTN[6]) {
+                this.arrows[this.arrows.indexOf(arrow)] = {
+                    x: this.w,
+                    y: this.h,
+                    dir: this.dir
+                };
+                
+                BTN[6] = 0;
+            }
+        
+            // Move arrows
+            if (arrow) {
+                let x = arrow.x;
+                let y = arrow.y;
+                let dir = arrow.dir;
+                let spd = 6;
+        
+                if (dir == 0) {
+                    y -= spd;
+                } else if (dir == 4) {
+                    y += spd;
+                } else if (dir == 2) {
+                    x += spd;
+                } else if (dir == 6) {
+                    x -= spd;
+                } else if (dir == 1) {
+                    x += (spd / 2);
+                    y -= (spd / 2);
+                } else if (dir == 5) {
+                    x -= (spd / 2);
+                    y += (spd / 2);
+                } else if (dir == 3) {
+                    x += (spd / 2);
+                    y += (spd / 2);
+                } else if (dir == 7) {
+                    x -= (spd / 2);
+                    y -= (spd / 2);
+                }
+                
+                // Set movement and angle
+                let b = document.getElementById(`shot${this.arrows.indexOf(arrow)}`).style;
+                b.left = `${x}px`;
+                b.top = `${y}px`;
+                
+                arrow.x = x;
+                arrow.y = y;
+                
+                // Checking if arrow is out of the screen
+                if (arrow.x > window.innerWidth || arrow.y > window.innerHeight || arrow.x < 0 || arrow.y < 0) {
+                    this.arrows[this.arrows.indexOf(arrow)] = 0;
+                    b.left = `${-50}px`;
+                    b.top = `${-50}px`;
+                }
+        
+                if ((this.x < arrow.x + 50) && (this.x + 50 < arrow.x) && (this.y < arrow.y + 50) && (this.y + 50 > arrow.y)) {}
+        
+                // Checking if arrow hits opponent and removing it
+                
+            
+            }
+        }
+    } */
     }
 
     draw(ctx) {
