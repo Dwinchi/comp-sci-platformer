@@ -126,8 +126,9 @@ function load(state) {
     } if (state == 20) {
         settings = new Settings();
     } if (state == 50) {
-        GC.level = JSON.parse(Get(`./levels/World1/simplified/${GC.levelID}/data.json`));
-        GC.level.data = JSON.parse("[" + Get(`./levels/World1/simplified/${GC.levelID}/IntGrid.csv`) + "]");
+        GC.level = JSON.parse(Get(`./static/levels/World1/simplified/${GC.levelID}/data.json`));
+        GC.level.data = JSON.parse("[" + Get(`./static/levels/World1/simplified/${GC.levelID}/IntGrid.csv`) + "]");
+        console.log(GC);
         p = new Player(GC.level.entities.Player[0].x,GC.level.entities.Player[0].y);
     }
 }
