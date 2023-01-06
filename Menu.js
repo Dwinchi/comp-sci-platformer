@@ -105,8 +105,8 @@ export class Settings {
         if (this.xSelect < 0) { this.xSelect = 2; }
         if (this.xSelect > 2) { this.xSelect = 0; }
 
-        if (BTN[5]>0) {
-            BTN[5] = -1;
+        if (BTN[4]>0) {
+            BTN[4] = -1;
             if (GC.back == 50) {
                 while (GC.obj.se.length != 0) { GC.obj.se.shift(); }
                 GC.state = 50;

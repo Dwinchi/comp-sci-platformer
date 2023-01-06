@@ -2149,16 +2149,16 @@
 					"entityInstances": [
 						{
 							"__identifier": "Player",
-							"__grid": [4,25],
+							"__grid": [6,10],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#0099DB",
-							"iid": "5a606190-7820-11ed-b049-a5ab7039e832",
+							"iid": "41180830-7820-11ed-8ef5-5716cf3e176c",
 							"width": 8,
 							"height": 8,
 							"defUid": 82,
-							"px": [32,200],
+							"px": [48,80],
 							"fieldInstances": []
 						}
 					]
@@ -3418,16 +3418,16 @@
 					"entityInstances": [
 						{
 							"__identifier": "Player",
-							"__grid": [3,21],
+							"__grid": [13,5],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#0099DB",
-							"iid": "56c33da0-7820-11ed-b049-4dad02bca6f0",
+							"iid": "3ad13eb0-7820-11ed-8ef5-012cf484820d",
 							"width": 8,
 							"height": 8,
 							"defUid": 82,
-							"px": [24,168],
+							"px": [104,40],
 							"fieldInstances": []
 						}
 					]

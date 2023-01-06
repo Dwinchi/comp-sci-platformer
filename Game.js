@@ -39,9 +39,9 @@ export let keys = [
     "arrowdown",
     "arrowleft",
     "arrowright",
-    "shift",
     "enter",
-    "e",
+    "z",
+    "x",
     "c",
 ]
 
