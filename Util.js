@@ -46,8 +46,6 @@ export function Touching(obj, x, y, dir) {
     t2 = l.data[x1 + (y2 * (l.width / 8))];
     t3 = l.data[x2 + (y2 * (l.width / 8))];
 
-    console.log(t0,t1,t2,t3);
-
     // Vertical
     if (t1 == 1 || t0 == 1) {
         return 1;
