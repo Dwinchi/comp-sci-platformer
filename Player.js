@@ -26,6 +26,7 @@ export class Player {
         this.arrows = [0,0,0];
         this.canFire = false;
         this.power = false;
+        
 
         GC.obj.en.push(this);
     }
