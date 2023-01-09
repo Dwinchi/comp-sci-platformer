@@ -65,17 +65,17 @@ export class Player {
         this.isOnWall = Touching(this, this.x + (1 * Math.sign(this.xSpd)), this.y, "x");
         
         // Wall jump
-        if (this.isOnWall && !this.isOnGround && BTN[7]>0) {
+        if (this.isOnWall && !this.isOnGround && BTN[5]>0) {
             this.wallJumpDelay = 3;
             this.isOnWall = 0;
             this.xSpd = -Math.sign(this.xSpd) * Physics.maxSpd;
             this.ySpd = Physics.jumpSpd;
-            BTN[7] = -1;
+            BTN[5] = -1;
         }
         // Jump
-        if (BTN[7]>0 && this.isOnGround) {
+        if (BTN[5]>0 && this.isOnGround) {
             this.ySpd = Physics.jumpSpd;
-            BTN[7] = -1;
+            BTN[5] = -1;
         }
         
         if (this.isOnWall) { this.xSpd = 0; }
