@@ -1,6 +1,13 @@
 console.clear();
 
-//import * as level from "./levels/1-2/level.json" assert { type: "json" };
+let socket = io();
+
+socket.on('newPosition', function(data) {
+    for (let i = 0; i < data.length; i++) {
+        console.log(data);
+    }
+});
+
 import { Lerp, Clamp } from './Util.js';
 import { Player } from "./Player.js";
 import { MainMenu, Settings } from "./Menu.js";
@@ -126,8 +133,8 @@ function load(state) {
     } if (state == 20) {
         settings = new Settings();
     } if (state == 50) {
-        GC.level = JSON.parse(Get(`./static/levels/World1/simplified/${GC.levelID}/data.json`));
-        GC.level.data = JSON.parse("[" + Get(`./static/levels/World1/simplified/${GC.levelID}/IntGrid.csv`) + "]");
+        GC.level = JSON.parse(Get(`./client/levels/World1/simplified/${GC.levelID}/data.json`));
+        GC.level.data = JSON.parse("[" + Get(`./client/levels/World1/simplified/${GC.levelID}/IntGrid.csv`) + "]");
         console.log(GC);
         p = new Player(GC.level.entities.Player[0].x,GC.level.entities.Player[0].y);
     }

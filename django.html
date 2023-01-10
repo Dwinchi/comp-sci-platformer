@@ -1,0 +1,63 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'projects/vercel.png' %}" />
+    <link rel="stylesheet" href="{% static 'projects/globals.css' %}">
+    <script src="{% static 'projects/theme.js' %}" async></script>
+
+    <meta name="description" content="This is my personal website, which includes some cool projects!">
+    <meta name="theme-color" content="#000"/>
+    
+    <link rel="stylesheet" href="{% static 'Game.css' %}">
+
+    <script src="{% static 'Game.js' %}" type="module" defer></script>
+
+    <title>Food Impact</title>
+</head>
+
+<body>
+    <div class="container">
+        <section id="preload" style="display: none;">
+            <div>
+                <img id="mainfont-0" src="{% static 'sprites/font/main_font_0.png' %}">
+                <img id="mainfont-1" src="{% static 'sprites/font/main_font_1.png' %}">
+                <img id="mainfont-2" src="{% static 'sprites/font/main_font_2.png' %}">
+                <img id="mainfont-3" src="{% static 'sprites/font/main_font_3.png' %}">
+                <img id="mainfont-4" src="{% static 'sprites/font/main_font_4.png' %}">
+                <img id="mainfont-5" src="{% static 'sprites/font/main_font_5.png' %}">
+                <img id="mainfont-6" src="{% static 'sprites/font/main_font_6.png' %}">
+                <img id="mainfont-7" src="{% static 'sprites/font/main_font_7.png' %}">
+                <img id="mainfont-8" src="{% static 'sprites/font/main_font_8.png' %}">
+                <img id="mainfont-9" src="{% static 'sprites/font/main_font_9.png' %}">
+                <img id="mainfont-10" src="{% static 'sprites/font/main_font_10.png' %}">
+                <img id="mainfont-11" src="{% static 'sprites/font/main_font_11.png' %}">
+                <img id="mainfont-12" src="{% static 'sprites/font/main_font_12.png' %}">
+                <img id="mainfont-13" src="{% static 'sprites/font/main_font_13.png' %}">
+                <img id="mainfont-14" src="{% static 'sprites/font/main_font_14.png' %}">
+                <img id="mainfont-15" src="{% static 'sprites/font/main_font_15.png' %}">
+            </div>
+            <div>
+                <img id="Level_0" src="{% static './levels/World1/simplified/Level_0/_composite.png' %}">
+                <img id="Level_1" src="{% static './levels/World1/simplified/Level_1/_composite.png' %}">
+                <img id="Level_2" src="{% static './levels/World1/simplified/Level_2/_composite.png' %}">
+            </div>
+            <img id="logo" src="{% static 'sprites/logo.png' %}">
+            <img id="settings" src="{% static 'sprites/menu/settings.png' %}">
+            <img id="player-img" src="{% static 'sprites/Player.png' %}">
+            <img id="l1-1" src="{% static 'levels/1-1/1-1.png' %}">
+        </section>
+        <section id="content">
+            <canvas class="game-layers" id="ui-layer" width="256" height="144"></canvas>
+            <canvas class="game-layers" id="entity-layer" width="256" height="144"></canvas>
+            <canvas class="game-layers" id="screen-layer" width="256" height="144"></canvas>
+        
+            <span id="fps" style="color: white;z-index: 10;position: absolute;">-</span>
+        </section>
+    </div>
+</body>
+</html>
