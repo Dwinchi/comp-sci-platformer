@@ -1,0 +1,19 @@
+#background{
+    position: absolute;
+}
+
+#ui-layer{
+    position: absolute;
+    image-rendering: pixelated;
+}
+
+.options{
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#pauseBtn{
+    position: absolute;
+    image-rendering: pixelated;
+}
