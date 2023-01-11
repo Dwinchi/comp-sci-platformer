@@ -4,12 +4,16 @@
 	"x": 0,
 	"y": 0,
 	"width": 256,
-	"height": 144,
+	"height": 256,
 	"bgColor": "#171C39",
 	"neighbourLevels": [
 		{
 			"levelIid": "deb14c10-7820-11ed-8ef5-132a76ca4d65",
 			"dir": "e"
+		},
+		{
+			"levelIid": "441ca330-7820-11ed-ad82-03a8cf12fd67",
+			"dir": "s"
 		}
 	],
 	"customFields" : {},
