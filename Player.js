@@ -145,10 +145,6 @@ export class Player {
         this.canFire = true;
     }
     
-    // If player has bow
-    if (bowPwr) {
-        canFire = true;
-    }
 
     // Firing bow 
     if (this.canFire) {
