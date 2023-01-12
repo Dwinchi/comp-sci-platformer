@@ -1,0 +1,24 @@
+{
+	"identifier": "Level_5",
+	"uniqueIdentifer": "f6843e20-7820-11ed-8877-bfcb1f302ced",
+	"x": 1400,
+	"y": 0,
+	"width": 1400,
+	"height": 984,
+	"bgColor": "#171C39",
+	"neighbourLevels": [
+		{
+			"levelIid": "fb8008d0-7820-11ed-9e5b-495294c54c2c",
+			"dir": "w"
+		},
+		{
+			"levelIid": "441ca330-7820-11ed-ad82-03a8cf12fd67",
+			"dir": "w"
+		}
+	],
+	"customFields" : {},
+	"layers": [
+		"IntGrid.png"
+	],
+	"entities" : {}
+}
