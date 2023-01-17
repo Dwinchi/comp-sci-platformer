@@ -20,6 +20,7 @@ export class Enemy {
         this.canJump = false,
         this.isOnWall = false;
         this.isOnGround = false;
+        
     }
 
 
