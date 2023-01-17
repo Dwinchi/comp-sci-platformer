@@ -69,7 +69,13 @@ function move(){
 }
 
 function pauseGame(){
-    pause = true;
+    console.log(pause)
+    if(pause == true){
+        pause = false;
+    }
+    else if(pause == false){
+        pause = true;
+    }
 }
 
 const frame = function() {
