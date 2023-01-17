@@ -1,4 +1,4 @@
-import { GC } from "./Game.js";
+
 
 let TS = {
     x: 11,
@@ -14,7 +14,7 @@ export function Clamp(num, min, max) {
     return Math.min(Math.max(num, min), max);
 }
 
-export function Touching(obj, x, y, dir) {
+/* export function Touching(obj, x, y, dir) {
     x = Math.floor(x);
     y = Math.floor(y);
 
@@ -61,4 +61,4 @@ export function Touching(obj, x, y, dir) {
     }
 
     return 0;
-}
+} */

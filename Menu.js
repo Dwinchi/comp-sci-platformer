@@ -1,4 +1,4 @@
-import { drawText, GC, menu, BTN, AXIS, Transition, keys } from "./Game.js";
+import { drawText, GC, menu, BTN, AXIS, keys } from "./Game.js";
 
 export class MainMenu {
     constructor(x, y , width, height) {
@@ -11,12 +11,11 @@ export class MainMenu {
         this.selected = 0;
         
         this.btns = [0,0,0];
-        this.btns[0] = new MenuBtn(0,128 - 10,100 + 2 + (0 * 8),"Start");
-        this.btns[1] = new MenuBtn(1,128 - 16,100 + 2 + (1 * 8),"Settings");
-        this.btns[2] = new MenuBtn(2,128 - 8,100 + 2 + (2 * 8),"Exit");
+        this.btns[0] = new MenuBtn(0,100 + 2 + (0 * 8),"HELP ME PLS");
+        this.btns[1] = new MenuBtn(1,100 + 2 + (1 * 8),"Multiplayer");
+        this.btns[2] = new MenuBtn(2,100 + 2 + (2 * 8),"Settings");
         
         this.btns[0].selected = 1;
-
     }
 
     update() {
@@ -30,21 +29,22 @@ export class MainMenu {
 
         this.btns[this.selected].selected = 1;
 
-        if (BTN[7]>0) {
+        if (BTN[5]>0) {
             if (this.selected == 0 ) {
-                BTN[7] = -1;
+                // Skip
                 Transition(50);
             } else if (this.selected == 1) {
-                BTN[7] = -1;
+                //Transition(10);
+                // Transition(50);
+            } else if (this.selected == 2) {
                 Transition(20,1);
             }
+            
+            BTN[5] = -1;
         }
     }
 
-    draw(ctx) {
-/*         let img = document.getElementById("MenuBG");
-        ctx.drawImage(img,0,0,320,180,0,0,320,180); */
-        
+    draw(ctx) {        
         ctx.fillStyle = "#f5d4ab";
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.strokeStyle = "#855731";
@@ -56,9 +56,9 @@ export class MainMenu {
 }
 
 export class MenuBtn {
-    constructor(index, x, y, txt) {
+    constructor(index, y, txt) {
         this.index = index;
-        this.x = x;
+        this.x = (256 / 2) - Math.floor((txt.length * 4) / 2);
         this.y = y;
         this.txt = txt;
         this.w = txt.length;
@@ -105,8 +105,8 @@ export class Settings {
         if (this.xSelect < 0) { this.xSelect = 2; }
         if (this.xSelect > 2) { this.xSelect = 0; }
 
-        if (BTN[4]>0) {
-            BTN[4] = -1;
+        if (BTN[6]>0) {
+            BTN[6] = -1;
             if (GC.back == 50) {
                 while (GC.obj.se.length != 0) { GC.obj.se.shift(); }
                 GC.state = 50;
@@ -117,9 +117,9 @@ export class Settings {
     draw(ctx) {
         let img = document.getElementById("settings");
         ctx.drawImage(img,0,0);
-        let k1
+        let k1;
         if (keys[2] == "arrowleft") {
-            k1 = "<"
+            k1 = "<";
         } else k1 = keys[2]
 
         if (BTN[2]>0 || BTN[2]<0) {
@@ -142,11 +142,11 @@ export class Settings {
             drawText(this.txt[2], this.x + 76, this.y + 4, 12);
         } else { drawText(this.txt[2], this.x + 76, this.y + 4, 7); }
 
-        drawText("Press ENTER to exit", this.x + 2, this.y + 76, 7);
+        drawText(`Press ${keys[6]} to go back`, this.x + 2, this.y + 76, 7);
     }
 
     keycheck(key) {
-        let k
+        let k;
         if (key == "arrowleft") {
             k = "<";
         } else if (key == "arrowright") {
