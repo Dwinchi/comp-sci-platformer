@@ -16,6 +16,11 @@ ctxEntity.imageSmoothingEnabled = false;
 ctxScreen.imageSmoothingEnabled = false;
 ctxUI.imageSmoothingEnabled = false;
 
+let TIMER;
+var fps = document.getElementById("fps");
+var startTime = Date.now();
+var frame = 0;
+
 export let Physics = {
     grav: 200,
     accel: 200,
@@ -45,6 +50,7 @@ socket.on('assignID', function(data) {
 });
 
 socket.on('updateClient', function(data) {
+    tick();
     // Pretty much just a new draw function
     ctxEntity.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     ctxScreen.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -52,7 +58,7 @@ socket.on('updateClient', function(data) {
     
     let players = data.players;
     let cam = players[localID].cam;
-    cam.img = document.getElementById(`Level_${data.game.levelID}`);
+    cam.img = document.getElementById(`Level_${data.levelID}`);
     ctxScreen.drawImage(cam.img,cam.x,cam.y,SCREEN_WIDTH,SCREEN_HEIGHT,0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 
     // Update players
@@ -60,7 +66,7 @@ socket.on('updateClient', function(data) {
         let p = players[i];
         if (p != undefined) {
             let img = document.getElementById(`p${i}`);
-        ctxEntity.drawImage(img,8 * p.si,8 * p.sr,8,8,p.x - cam.x, p.y - cam.y,8,8);
+            ctxEntity.drawImage(img,8 * p.si,8 * p.sr,8,8,p.x - cam.x, p.y - cam.y,8,8);
         }
     }
 });
@@ -118,9 +124,10 @@ document.addEventListener("keyup", function(e) { changeKey(e.key, 0) });
 window.addEventListener("resize", resize);
 
 function resize() {
-    let winW = Math.floor(window.innerHeight / SCREEN_HEIGHT);
-    let winH = Math.floor(window.innerWidth / SCREEN_WIDTH);
+    let winW = window.innerHeight / SCREEN_HEIGHT;
+    let winH = window.innerWidth / SCREEN_WIDTH;
     let SCALE = Math.min(winW,winH);
+    console.log(window.innerHeight / SCREEN_HEIGHT,window.innerWidth / SCREEN_WIDTH);
     
     const layer = document.querySelectorAll('.game-layers');
     
@@ -153,6 +160,16 @@ export class Camera {
             this.y = Lerp(this.y, this.fyPos, 0.1);
             this.y = Clamp(this.y, 0, GC.level.height - SCREEN_HEIGHT);
         }
+    }
+}
+
+function tick() {
+    var time = Date.now();
+    frame++;
+    if (time - startTime > 1000) {
+        fps.innerHTML = (frame / ((time - startTime) / 1000)).toFixed(1);
+        startTime = time;
+        frame = 0;
     }
 }
 
