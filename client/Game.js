@@ -1,7 +1,9 @@
-//import { Player } from "./Player.js";
 import { Lerp, Clamp } from './Util.js';
+import * as initWORLD from "./levels/World1.json" assert { type: "json" };
 
 console.clear();
+
+let WORLD = initWORLD.default;
 
 let socket = io();
 
@@ -21,15 +23,16 @@ var fps = document.getElementById("fps");
 var startTime = Date.now();
 var frame = 0;
 
-export let Physics = {
+let Physics = {
     grav: 200,
     accel: 200,
     deccel: 400,
     maxSpd: 2000,
-    jumpSpd: -3500,
+    jumpSpd: -3000,
+    fallSpd: 4000,
 }
 
-export let keys = [
+let keys = [
     "arrowup",
     "arrowdown",
     "arrowleft",
@@ -40,54 +43,78 @@ export let keys = [
     "c",
 ]
 
-export let BTN = [0,0,0,0,0,0,0,0];
-export let AXIS = [0,0];
+let BTN = [0,0,0,0,0,0,0,0];
+let AXIS = [0,0];
 let localID = null;
+let localPlayer = null;
+let PLAYER_LIST = [];
+let connected = 0;
+
+function startTimer() {
+    resize();
+    TIMER = setInterval(update, (1000/60));
+}
 
 socket.on('initClient', function(data) {
     localID = data.localID;
+    PLAYER_LIST = data.PLAYER_LIST;
+    connected = 1;
+    localPlayer = data.localPlayer;
 });
 
 socket.on('updateClient', function(data) {
-    tick();
-    // Pretty much just a new draw function
-    ctxEntity.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    ctxScreen.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    ctxUI.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    
-    let players = data.players;
-    console.log(players);
-    let cam = players[localID].cam;
-    cam.img = document.getElementById(`Screen_${players[localID].screen}`);
-    ctxScreen.drawImage(cam.img,cam.x,cam.y,SCREEN_WIDTH,SCREEN_HEIGHT,0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
-
     // Update players
-    for (let i = 0; i < players.length; i++) {
-        let p = players[i];
-        if (p != undefined && p.screen == players[localID].screen) {
-            let img = document.getElementById(`p${i}`);
-            ctxEntity.drawImage(img,8 * p.si,8 * p.sr,8,8,p.xInt - cam.x, p.yInt - cam.y,8,8);
+    for (let i = 0; i < data.players.length; i++) {
+        if (i != localID) {
+            PLAYER_LIST[i] = data.players[i]
         }
     }
 });
 
-function startTimer() {
-    resize();
-    load(GC.state);
-    TIMER = setInterval(update, (1000/60));
+function update() {
+    tick();
+    if (connected == 1) {
+        playerUpdate(localPlayer);
+
+        let pack = {
+            id: localPlayer.id,
+            color: localPlayer.color,
+            xInt: localPlayer.xInt,
+            yInt: localPlayer.yInt,
+            w: 7,
+            h: 7,
+            screen: localPlayer.screen,
+            // animation
+            facing: localPlayer.facing,
+            s: localPlayer.s,
+            si: localPlayer.si,
+            sr: localPlayer.sr,
+        }
+        PLAYER_LIST[localID] = pack;
+        socket.emit('updateServer', pack);
+
+        draw();
+    }
 }
 
 function draw() {
+    // Pretty much just a new draw function
     ctxEntity.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     ctxScreen.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     ctxUI.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    if (GC.level != null && GC.cam != null) { ctxScreen.drawImage(GC.cam.img,GC.cam.x,GC.cam.y,SCREEN_WIDTH,SCREEN_HEIGHT,0,0,SCREEN_WIDTH,SCREEN_HEIGHT); }
-
-    for (const i of GC.obj.me) { i.draw(ctxEntity); }
-    for (const i of GC.obj.pl) { i.draw(ctxEntity); }
-    for (const i of GC.obj.en) { i.draw(ctxEntity); }
-    for (const i of GC.obj.se) { i.draw(ctxEntity); }
+    let cam = localPlayer.cam;
+    cam.img = document.getElementById(`Screen_${localPlayer.screen}`);
+    ctxScreen.drawImage(cam.img,cam.x,cam.y,SCREEN_WIDTH,SCREEN_HEIGHT,0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
+    
+    // Draw players
+    for (let i = 0; i < PLAYER_LIST.length; i++) {
+        let p = PLAYER_LIST[i];
+        if (p != null && p.screen == PLAYER_LIST[localID].screen) {
+            let img = document.getElementById(`p${p.color}`);
+            ctxEntity.drawImage(img,8 * p.si,8 * p.sr,8,8,p.xInt - cam.x, p.yInt - cam.y,8,8);
+        }
+    }
 }
 
 function changeKey(key, state) {
@@ -118,11 +145,6 @@ function changeKey(key, state) {
     } else if ((!BTN[2] && !BTN[3]) || (BTN[2]>0 && BTN[3]>0)) {
         AXIS[1] = 0;
     }
-
-    socket.emit('updateKeys', {
-        BTN: BTN,
-        AXIS: AXIS
-    });
 }
 
 document.addEventListener("keydown", function(e) { changeKey(e.key, 1) });
@@ -142,31 +164,6 @@ function resize() {
     });
 }
 
-export class Camera {
-    constructor(obj) {
-        this.img = document.getElementById(GC.level.identifier);
-        this.x = obj.x;
-        this.y = obj.y;
-        this.obj = obj;
-        
-        GC.obj.en.push(this);
-    }
-
-    update() {
-        //* Camera follows object
-        if (GC.level.width > SCREEN_WIDTH) {
-            this.fxPos = this.obj.x - (SCREEN_WIDTH / 2) - 4;
-            this.x = Lerp(this.x, this.fxPos, 0.1);
-            this.x = Clamp(this.x, 0, GC.level.width - SCREEN_WIDTH);
-        }
-        if (GC.level.height > SCREEN_HEIGHT) {
-            this.fyPos = this.obj.y - (SCREEN_HEIGHT / 2) - 4;
-            this.y = Lerp(this.y, this.fyPos, 0.1);
-            this.y = Clamp(this.y, 0, GC.level.height - SCREEN_HEIGHT);
-        }
-    }
-}
-
 function tick() {
     var time = Date.now();
     frame++;
@@ -177,178 +174,271 @@ function tick() {
     }
 }
 
-window.onload = resize();
+window.onload = startTimer();
 
-let Player = function(id) {
-    let self = {
-        id: id,
-        x: Game.currentLevel.layerInstances[0].entityInstances[0].px[0],
-        y: Game.currentLevel.layerInstances[0].entityInstances[0].px[1],
-        w: 8,
-        h: 8,
-        screen: Game.screenID,
-        xSpd: 0,
-        ySpd: 0,
-        BTN: [0,0,0,0],
-        AXIS: [0,0],
-        // animation
-        s: 0,
-        si: 0,
-        sr: 0,
-        st: 0,
-        // states
-        canJump: false,
-        isOnWall: false,
-        isOnGround: false,
-        // timer
-        wallJumpDelay: 0,
+function playerUpdate(p) {
+    /* -------------------------------------------------------------------------- */
+    /*                               Player movement                              */
+    /* -------------------------------------------------------------------------- */
+    if (Touching(p, p.x, p.y + 1, 1)) {
+        p.isOnGround = 1;
+        p.canJump = p.maxJumps;
+        p.canDash = 1;
+    }
+    else {
+        p.isOnGround = 0;
+        p.canJump = 0; // Just one jump
+    }
+    p.wallJumpDelay = Math.max(p.wallJumpDelay-1,0);
 
-        cam: {
-            x: 0,
-            y: 0
-        }
+    // Collision with lava
+    if (Touching(p, p.x, p.y, 2) && !p.isDashing) {
+        p.x = p.enteredX;
+        p.y = p.enteredY;
+    }
+    if (Touching(p, p.x, p.y, 3)) {
+        p.grav = 25;
+        p.accel = 100;
+        p.deccel = 200;
+        p.maxSpd = 1000;
+        p.jumpSpd = -750;
+        p.fallSpd = 1000;
+        p.lastState = 3;
+        p.canJump = 1;
+    } else {
+        p.grav = Physics.grav;
+        p.accel = Physics.accel;
+        p.deccel = Physics.deccel;
+        p.maxSpd = Physics.maxSpd;
+        p.jumpSpd = Physics.jumpSpd;
+        p.fallSpd = Physics.fallSpd;
+        if (p.lastState == 3 && BTN[5]) { p.ySpd = p.jumpSpd; }
+        p.lastState = 0;
     }
 
-    self.update = function() {
-        /* -------------------------------------------------------------------------- */
-        /*                               Player movement                              */
-        /* -------------------------------------------------------------------------- */
-        self.isOnGround = Touching(self, self.x, self.y + 1);
-        self.wallJumpDelay = Math.max(self.wallJumpDelay-1,0);
-        
-        if (!self.wallJumpDelay) {
-            // Accelerate
-            if (self.AXIS[1]) { self.xSpd += (Physics.accel*self.AXIS[1]); }
-            
-            // Deccelerate
-            if (!self.AXIS[1]) {
-                if ((self.xSpd > 0 && self.xSpd - (Physics.deccel * Math.sign(self.xSpd)) < 0) ||
-                (self.xSpd < 0 && self.xSpd - (Physics.deccel * Math.sign(self.xSpd)) > 0)) {
-                    self.xSpd = 0;
-                }
-                self.xSpd -= (Physics.deccel * Math.sign(self.xSpd));
-                if (!self.xSpd) { self.x =  Math.floor(self.x); }
-            }
-            self.xSpd = Clamp(self.xSpd,-Physics.maxSpd,Physics.maxSpd);
-        }
-    
-        self.isOnWall = Touching(self, self.x + (1 * Math.sign(self.xSpd)), self.y);
-        
-        // Wall jump
-        if (self.isOnWall && !self.isOnGround && self.BTN[5]>0) {
-            self.wallJumpDelay = 3;
-            self.isOnWall = 0;
-            self.xSpd = -Math.sign(self.xSpd) * Physics.maxSpd;
-            self.ySpd = Physics.jumpSpd;
-            self.BTN[5] = -1;
-        }
-        // Jump
-        if (self.BTN[5]>0 && self.isOnGround) {
-            self.ySpd = Physics.jumpSpd;
-            self.BTN[5] = -1;
-        }
-        
-        if (self.isOnWall) { self.xSpd = 0; }
-    
-        // Wall slide
-        if (self.isOnWall && self.ySpd > 0) { self.ySpd = Physics.grav/2; }
-        // Normal gravity
-        else { self.ySpd += Physics.grav; }
-    
-        self.ySpd = Clamp(self.ySpd,-4000,4000);
-        
-        // Horizontal collision
-        if (Touching(self, self.x + (self.xSpd/1000), self.y)) {
-            while (!Touching(self, self.x + Math.sign(self.xSpd), self.y)) { self.x += Math.sign(self.xSpd); }
-            self.xSpd = 0;
-        }
-        self.x += Math.floor(Math.abs(self.xSpd) / 1000) * Math.sign(self.xSpd);
-        
-        // Vertical collision
-        if (Touching(self, self.x, self.y + (self.ySpd/1000))) {
-            while (!Touching(self, self.x, self.y + Math.sign(self.ySpd))) { self.y += Math.sign(self.ySpd); }
-            self.ySpd = 0;
-        }
-        self.y += (self.ySpd / 1000);
+    if (p.canDash && BTN[6]>0) {
+        BTN[6] = -1;
+        p.isDashing = 1;
+        p.dashTimer = 8;
+    }
 
-        checkScreenChange(self);
-
-        function checkScreenChange(obj) {
-            let x = [0,0,0,0];
-            let y = [0,0,0,0];
-        
-            let l = Game.currentLevel.layerInstances[0].entityInstances;
-
-            for (let i of l) {
-                if (i.__identifier == "Change_Area") {
-                    x[0] = obj.x;
-                    x[1] = obj.x + obj.w;
-                    x[2] = i.px[0];
-                    x[3] = i.px[0] + i.width;
-                    y[0] = obj.y;
-                    y[1] = obj.y + obj.h;
-                    y[2] = i.px[1];
-                    y[3] = i.px[1] + i.height;
-
-                    if (
-                        x[0] <= x[3] &&
-                        x[1] >= x[2] &&
-                        y[0] <= y[3] &&
-                        y[1] >= y[2]) {
-                        console.log("Collision detected!");
-                        let next = i.fieldInstances[0].__value;
-                        let nextUID = Game.currentLevel.__neighbours.find(({ dir }) => dir === next).levelIid;
-                        let nextScreen = Game.world.levels.find(({ iid }) => iid === nextUID).identifier.split("_").pop();
-                        obj.screen = nextScreen;
-                        
-                    }
-                }
-            }
-        }
-
-        /* -------------------------------------------------------------------------- */
-        /*                                  ANIMATION                                 */
-        /* -------------------------------------------------------------------------- */
-
-        // Set rotation
-        if (self.xSpd > 0) { self.sr = 0; }
-        else if (self.xSpd < 0) { self.sr = 1; }
-
-        // Idle
-        if (self.isOnGround && !self.xSpd) { self.si = 0; }
-        // Run
-        if (self.xSpd) {
-            if (self.si == 0 && self.st == 0) { self.si = 1; }
-            self.st++;
-
-            if (self.st == 6) {
-                self.st = 0;
-                // Continue animation
-                self.si++;
-                if (self.si >= 5) {
-                    self.si = 1;
-                }
-            }
-        }
-        if (!self.isOnGround) {
-            // Jumping & falling
-            if (self.ySpd < 0) { self.si = 3; }
-            if (self.ySpd > 0) { self.si = 4; }
-        }
-
-        if (self.isOnWall && !self.isOnGround) { self.si = 5; }
-    
-        // UPDATE CAMERA
-        //* Camera follows object
-        if (Game.currentLevel.pxWid > SCREEN_WIDTH) {
-            self.cam.x = self.x - (SCREEN_WIDTH / 2) - 4;
-            self.cam.x = Clamp(self.cam.x, 0, Game.currentLevel.pxWid - SCREEN_WIDTH);
-        }
-        if (Game.currentLevel.pxHei > SCREEN_HEIGHT) {
-            self.cam.y = self.y - (SCREEN_HEIGHT / 2) - 4;
-            self.cam.y = Clamp(self.cam.y, 0, Game.currentLevel.pxHei - SCREEN_HEIGHT);
+    if (p.isDashing) {
+        p.color = 8;
+        p.xSpd = 5000 * p.facing;
+        p.ySpd = 0;
+        p.maxSpd = 5000;
+        p.canDash = 0;
+        p.dashTimer = Math.max(p.dashTimer-1,0);
+        if (p.dashTimer == 0) {
+            p.color = p.id;
+            p.isDashing = 0;
         }
     }
-    return self;
+    
+    checkScreenChange(p);
+
+    if (!p.wallJumpDelay) {
+        // Accelerate
+        if (AXIS[1]) { p.xSpd += (p.accel*AXIS[1]); }
+        
+        // Deccelerate
+        if (!AXIS[1]) {
+            if ((p.xSpd > 0 && p.xSpd - (p.deccel * Math.sign(p.xSpd)) < 0) ||
+            (p.xSpd < 0 && p.xSpd - (p.deccel * Math.sign(p.xSpd)) > 0)) {
+                p.xSpd = 0;
+            }
+            p.xSpd -= (p.deccel * Math.sign(p.xSpd));
+            if (!p.xSpd) { p.x =  Math.floor(p.x); }
+        }
+        p.xSpd = Clamp(p.xSpd,-p.maxSpd,p.maxSpd);
+    }
+    if (Touching(p, p.x + (1 * Math.sign(p.xSpd)), p.y, 1)) {
+        p.isOnWall = 1;
+        p.canDash = 1;
+    }
+    else { p.isOnWall = 0; }
+    
+    // Wall jump
+    if (p.isOnWall && !p.isOnGround && BTN[5]>0 && p.lastState != 3) {
+        p.wallJumpDelay = 1;
+        p.isOnWall = 0;
+        p.xSpd = -Math.sign(p.xSpd) * p.maxSpd;
+        jump(p);
+    }
+    // Jump
+    if (BTN[5]>0 && p.canJump) { jump(p); }
+    
+    if (p.isOnWall) { p.xSpd = 0; }
+
+    // Wall slide
+    if (p.isOnWall && p.ySpd > 0 && p.lastState != 3) { p.ySpd = p.grav/2; }
+    // Normal gravity
+    else if (!p.isOnGround) { p.ySpd += p.grav; }
+
+    p.ySpd = Clamp(p.ySpd,-p.fallSpd,p.fallSpd);
+    
+    // Horizontal collision
+    if (Touching(p, p.x + (p.xSpd/1000), p.y, 1)) {
+        while (!Touching(p, p.x + Math.sign(p.xSpd), p.y, 1)) { p.x += Math.sign(p.xSpd); }
+        p.xSpd = 0;
+    }
+    p.x += (Math.abs(p.xSpd) / 1000) * Math.sign(p.xSpd);
+    p.xInt = Math.floor(p.x);
+    
+    // Vertical collision
+    if (Touching(p, p.x, p.y + (p.ySpd/1000), 1)) {
+        while (!Touching(p, p.x, p.y + Math.sign(p.ySpd), 1)) { p.y += Math.sign(p.ySpd); }
+        p.ySpd = 0;
+    }
+    //p.y += (p.ySpd / 1000);
+    p.y += (Math.abs(p.ySpd) / 1000) * Math.sign(p.ySpd);
+    p.yInt = Math.floor(p.y);
+
+    /* -------------------------------------------------------------------------- */
+    /*                                  ANIMATION                                 */
+    /* -------------------------------------------------------------------------- */
+
+    // Set rotation
+    if (p.xSpd > 0) {
+        p.sr = 0;
+        p.facing = 1;
+    }
+    else if (p.xSpd < 0) {
+        p.sr = 1;
+        p.facing = -1;
+    }
+
+    // EMOTE
+    if (p.isOnGround && !p.xSpd && AXIS[0] == 1) {
+        p.st++;
+
+        if (p.st == 6) {
+            p.st = 0;
+            // Continue animation
+            if (p.animID == 0) { p.si = 0; p.sr = 0; }
+            if (p.animID == 1) { p.si = 6; p.sr = 0; }
+            if (p.animID == 2) { p.si = 6; p.sr = 1; }
+            if (p.animID == 3) { p.si = 0; p.sr = 1; }
+            if (p.animID == 4) { p.si = 6; p.sr = 1; }
+            if (p.animID == 5) { p.si = 6; p.sr = 0; }
+            p.animID++;
+            if (p.animID == 6) { p.animID = 0; }
+        }
+    }
+    // Idle
+    else if (p.isOnGround && !p.xSpd) { p.si = 0; }
+    // Run
+    if (p.xSpd) {
+        if (p.si == 0 && p.st == 0) { p.si = 1; }
+        p.st++;
+
+        if (p.st == 6) {
+            p.st = 0;
+            // Continue animation
+            p.si++;
+            if (p.si >= 5) {
+                p.si = 1;
+            }
+        }
+    }
+    if (!p.isOnGround) {
+        // Jumping & falling
+        if (p.ySpd < 0) { p.si = 3; }
+        if (p.ySpd > 0) { p.si = 4; }
+    }
+    // Wallslide
+    if (p.isOnWall && !p.isOnGround && p.lastState != 3) { p.si = 5; }
+
+    // UPDATE CAMERA
+    //* Camera follows object
+    if (WORLD.levels[p.screen].pxWid > SCREEN_WIDTH) {
+        p.cam.x = p.x - (SCREEN_WIDTH / 2) - 4;
+        p.cam.x = Clamp(p.cam.x, 0, WORLD.levels[p.screen].pxWid - SCREEN_WIDTH);
+    } else { p.cam.x = 0; }
+    if (WORLD.levels[p.screen].pxHei > SCREEN_HEIGHT) {
+        p.cam.y = p.y - (SCREEN_HEIGHT / 2) - 4;
+        p.cam.y = Clamp(p.cam.y, 0, WORLD.levels[p.screen].pxHei - SCREEN_HEIGHT);
+    } else { p.cam.y = 0; }
 }
 
+function jump(p) {
+    p.ySpd = p.jumpSpd;
+    BTN[5] = -1;
+    p.canJump = Math.max(p.canJump-1,0);
+}
+
+function checkScreenChange(obj) {
+    let x = [0,0,0,0];
+    let y = [0,0,0,0];
+
+    let l = WORLD.levels[obj.screen].layerInstances[0].entityInstances;
+
+    for (let i of l) {
+        if (i.__identifier == "Change_Area") {
+            x[0] = obj.x;
+            x[1] = obj.x + obj.w;
+            x[2] = i.px[0];
+            x[3] = i.px[0] + i.width;
+            y[0] = obj.y;
+            y[1] = obj.y + obj.h;
+            y[2] = i.px[1];
+            y[3] = i.px[1] + i.height;
+
+            if (
+                x[0] <= x[3] &&
+                x[1] >= x[2] &&
+                y[0] <= y[3] &&
+                y[1] >= y[2]) {
+                let nextScreen = i.fieldInstances[0].__value;
+                let nextDir = i.fieldInstances[1].__value;
+                obj.screen = nextScreen;
+                if (nextDir == 1) { obj.x = 2; }
+                if (nextDir == 3) { obj.x = 246; }
+                if (nextDir == 0) { obj.y = 134; }
+                if (nextDir == 2) { obj.y = 2; }
+
+                obj.enteredX = obj.x;
+                obj.enteredY = obj.y;
+            }
+        }
+    }
+}
+
+function Touching(obj, x, y, checkFor) {
+    x = Math.floor(x);
+    y = Math.floor(y);
+
+    let x1;
+    let x2;
+    let y1;
+    let y2;
+    let t0;
+    let t1;
+    let t2;
+    let t3;
+
+    let l = WORLD.levels[obj.screen].layerInstances[1];
+
+    x1 = Math.floor(x / 8);
+    x2 = Math.floor((x + obj.w) / 8);
+    y1 = Math.floor(y / 8);
+    y2 = Math.floor((y + obj.h) / 8);
+
+    t0 = l.intGridCsv[x1 + (y1 * (l.__cWid))];
+    t1 = l.intGridCsv[x2 + (y1 * (l.__cWid))];
+    t2 = l.intGridCsv[x1 + (y2 * (l.__cWid))];
+    t3 = l.intGridCsv[x2 + (y2 * (l.__cWid))];
+
+    if (t1 == checkFor || t0 == checkFor) {
+        return checkFor;
+    } else if (t2 == checkFor || t3 == checkFor) {
+        return checkFor;
+    }
+
+    if (t1 == checkFor || t3 == checkFor) {
+        return checkFor;
+    } else if (t0 == checkFor || t2 == checkFor) {
+        return checkFor;
+    }
+    return 0;
+}
