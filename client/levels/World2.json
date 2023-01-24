@@ -11,7 +11,7 @@
 	"iid": "b381e780-7820-11ed-8e3a-d79845cb4c49",
 	"jsonVersion": "1.2.5",
 	"appBuildId": 464870,
-	"nextUid": 700,
+	"nextUid": 701,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "GridVania",
@@ -98,6 +98,30 @@
 			"autoRuleGroups": [
 				{ "uid": 364, "name": "Lava", "active": true, "isOptional": false, "rules": [
 					{
+						"uid": 367,
+						"active": true,
+						"size": 3,
+						"tileIds": [112],
+						"chance": 1,
+						"breakOnMatch": true,
+						"pattern": [0,2,0,-2,2,-2,0,0,0],
+						"flipX": false,
+						"flipY": false,
+						"xModulo": 1,
+						"yModulo": 1,
+						"xOffset": 0,
+						"yOffset": 0,
+						"checker": "None",
+						"tileMode": "Single",
+						"pivotX": 0,
+						"pivotY": 0,
+						"outOfBoundsValue": null,
+						"perlinActive": true,
+						"perlinSeed": 2014838,
+						"perlinScale": 0.2,
+						"perlinOctaves": 2
+					},
+					{
 						"uid": 369,
 						"active": true,
 						"size": 3,
@@ -118,30 +142,6 @@
 						"outOfBoundsValue": null,
 						"perlinActive": false,
 						"perlinSeed": 7419165,
-						"perlinScale": 0.2,
-						"perlinOctaves": 2
-					},
-					{
-						"uid": 367,
-						"active": true,
-						"size": 3,
-						"tileIds": [112],
-						"chance": 1,
-						"breakOnMatch": true,
-						"pattern": [0,2,0,2,2,2,0,0,0],
-						"flipX": false,
-						"flipY": false,
-						"xModulo": 1,
-						"yModulo": 1,
-						"xOffset": 0,
-						"yOffset": 0,
-						"checker": "None",
-						"tileMode": "Single",
-						"pivotX": 0,
-						"pivotY": 0,
-						"outOfBoundsValue": null,
-						"perlinActive": true,
-						"perlinSeed": 2014838,
 						"perlinScale": 0.2,
 						"perlinOctaves": 2
 					},
@@ -3951,6 +3951,38 @@
 					"allowedRefs": "OnlySame",
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "GoTo",
+					"doc": null,
+					"__type": "EntityRef",
+					"uid": 700,
+					"type": "F_EntityRef",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "RefLinkBetweenCenters",
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "CurvedArrow",
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "Any",
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		},
@@ -4100,7 +4132,16 @@
 							"px": [255,104],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 1, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
-								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
+								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
+								{ "__identifier": "GoTo", "__value": {
+									"entityIid": "b9029090-7820-11ed-9a99-3911ee6e2f76",
+									"layerIid": "5ae406f0-7820-11ed-8bb7-e57016e69673",
+									"levelIid": "5ae3dfe0-7820-11ed-8bb7-97c225d427a7",
+									"worldIid": "b7c143b0-7820-11ed-ba7d-7f8cc1d7c8ba"
+								}, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["b9029090-7820-11ed-9a99-3911ee6e2f76"]
+								}] }
 							]
 						},
 						{
@@ -4827,7 +4868,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Change_Area",
-							"__grid": [32,14],
+							"__grid": [31,14],
 							"__pivot": [0,0],
 							"__tags": ["region"],
 							"__tile": null,
@@ -4836,10 +4877,11 @@
 							"width": 1,
 							"height": 24,
 							"defUid": 451,
-							"px": [256,112],
+							"px": [255,112],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 3, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
-								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
+								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
@@ -4856,7 +4898,16 @@
 							"px": [0,256],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 2, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [2] }] },
-								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
+								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
+								{ "__identifier": "GoTo", "__value": {
+									"entityIid": "b3fe6290-7820-11ed-9a99-3df35c6298d1",
+									"layerIid": "d2cee131-7820-11ed-8bb7-a3ecc0e8ee9e",
+									"levelIid": "d2cee130-7820-11ed-8bb7-13f8ae281ecd",
+									"worldIid": "b7c143b0-7820-11ed-ba7d-7f8cc1d7c8ba"
+								}, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["b3fe6290-7820-11ed-9a99-3df35c6298d1"]
+								}] }
 							]
 						},
 						{
@@ -4873,7 +4924,16 @@
 							"px": [0,104],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 0, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [0] }] },
-								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
+								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
+								{ "__identifier": "GoTo", "__value": {
+									"entityIid": "e9be7c90-7820-11ed-813c-5b8a308096ac",
+									"layerIid": "8c9329c1-7820-11ed-821d-07225862b380",
+									"levelIid": "8c9329c0-7820-11ed-821d-c7cd2aeee8af",
+									"worldIid": "b7c143b0-7820-11ed-ba7d-7f8cc1d7c8ba"
+								}, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["e9be7c90-7820-11ed-813c-5b8a308096ac"]
+								}] }
 							]
 						},
 						{
@@ -7077,7 +7137,7 @@
 						},
 						{
 							"__identifier": "Change_Area",
-							"__grid": [32,14],
+							"__grid": [31,14],
 							"__pivot": [0,0],
 							"__tags": ["region"],
 							"__tile": null,
@@ -7086,10 +7146,19 @@
 							"width": 1,
 							"height": 24,
 							"defUid": 451,
-							"px": [256,112],
+							"px": [255,112],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 1, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
-								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
+								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
+								{ "__identifier": "GoTo", "__value": {
+									"entityIid": "b13111c0-7820-11ed-9a99-050334fe0278",
+									"layerIid": "5ae406f0-7820-11ed-8bb7-e57016e69673",
+									"levelIid": "5ae3dfe0-7820-11ed-8bb7-97c225d427a7",
+									"worldIid": "b7c143b0-7820-11ed-ba7d-7f8cc1d7c8ba"
+								}, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["b13111c0-7820-11ed-9a99-050334fe0278"]
+								}] }
 							]
 						}
 					]
@@ -7876,7 +7945,7 @@
 						},
 						{
 							"__identifier": "Change_Area",
-							"__grid": [32,3],
+							"__grid": [31,3],
 							"__pivot": [0,0],
 							"__tags": ["region"],
 							"__tile": null,
@@ -7885,10 +7954,11 @@
 							"width": 1,
 							"height": 64,
 							"defUid": 451,
-							"px": [256,24],
+							"px": [255,24],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 4, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [4] }] },
-								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
+								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
@@ -7905,7 +7975,8 @@
 							"px": [0,112],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 1, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
-								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
+								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						}
 					]
@@ -8682,7 +8753,8 @@
 							"px": [0,192],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 5, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [5] }] },
-								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
+								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
@@ -8699,7 +8771,8 @@
 							"px": [0,24],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 3, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
-								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
+								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						}
 					]
@@ -9994,19 +10067,41 @@
 						{ "px": [184,224], "src": [88,72], "f": 1, "t": 119, "d": [373,919] },
 						{ "px": [192,224], "src": [88,72], "f": 0, "t": 119, "d": [373,920] },
 						{ "px": [40,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1061] },
+						{ "px": [48,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1062] },
+						{ "px": [56,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1063] },
+						{ "px": [64,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1064] },
+						{ "px": [72,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1065] },
+						{ "px": [80,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1066] },
+						{ "px": [88,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1067] },
 						{ "px": [96,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1068] },
+						{ "px": [104,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1069] },
+						{ "px": [112,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1070] },
+						{ "px": [120,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1071] },
 						{ "px": [128,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1072] },
+						{ "px": [136,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1073] },
 						{ "px": [144,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1074] },
 						{ "px": [152,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1075] },
 						{ "px": [160,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1076] },
 						{ "px": [168,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1077] },
 						{ "px": [176,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1078] },
+						{ "px": [184,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1079] },
+						{ "px": [192,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1080] },
+						{ "px": [200,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1081] },
+						{ "px": [208,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1082] },
+						{ "px": [216,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1083] },
+						{ "px": [224,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1084] },
 						{ "px": [232,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1085] },
 						{ "px": [240,264], "src": [32,64], "f": 0, "t": 100, "d": [366,1086] },
 						{ "px": [40,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1093] },
+						{ "px": [48,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1094] },
+						{ "px": [56,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1095] },
+						{ "px": [64,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1096] },
+						{ "px": [72,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1097] },
 						{ "px": [80,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1098] },
 						{ "px": [88,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1099] },
 						{ "px": [96,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1100] },
+						{ "px": [104,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1101] },
+						{ "px": [112,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1102] },
 						{ "px": [120,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1103] },
 						{ "px": [128,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1104] },
 						{ "px": [136,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1105] },
@@ -10015,6 +10110,12 @@
 						{ "px": [160,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1108] },
 						{ "px": [168,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1109] },
 						{ "px": [176,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1110] },
+						{ "px": [184,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1111] },
+						{ "px": [192,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1112] },
+						{ "px": [200,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1113] },
+						{ "px": [208,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1114] },
+						{ "px": [216,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1115] },
+						{ "px": [224,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1116] },
 						{ "px": [232,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1117] },
 						{ "px": [240,272], "src": [32,64], "f": 0, "t": 100, "d": [366,1118] },
 						{ "px": [200,248], "src": [32,56], "f": 0, "t": 88, "d": [368,1017] },
@@ -10047,35 +10148,7 @@
 						{ "px": [216,256], "src": [32,80], "f": 0, "t": 124, "d": [370,1051] },
 						{ "px": [224,256], "src": [32,80], "f": 0, "t": 124, "d": [370,1052] },
 						{ "px": [232,256], "src": [32,80], "f": 0, "t": 124, "d": [370,1053] },
-						{ "px": [240,256], "src": [32,80], "f": 0, "t": 124, "d": [370,1054] },
-						{ "px": [48,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1062] },
-						{ "px": [56,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1063] },
-						{ "px": [64,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1064] },
-						{ "px": [72,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1065] },
-						{ "px": [80,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1066] },
-						{ "px": [88,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1067] },
-						{ "px": [104,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1069] },
-						{ "px": [112,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1070] },
-						{ "px": [120,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1071] },
-						{ "px": [136,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1073] },
-						{ "px": [184,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1079] },
-						{ "px": [192,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1080] },
-						{ "px": [200,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1081] },
-						{ "px": [208,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1082] },
-						{ "px": [216,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1083] },
-						{ "px": [224,264], "src": [32,72], "f": 0, "t": 112, "d": [367,1084] },
-						{ "px": [48,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1094] },
-						{ "px": [56,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1095] },
-						{ "px": [64,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1096] },
-						{ "px": [72,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1097] },
-						{ "px": [104,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1101] },
-						{ "px": [112,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1102] },
-						{ "px": [184,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1111] },
-						{ "px": [192,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1112] },
-						{ "px": [200,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1113] },
-						{ "px": [208,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1114] },
-						{ "px": [216,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1115] },
-						{ "px": [224,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1116] }
+						{ "px": [240,256], "src": [32,80], "f": 0, "t": 124, "d": [370,1054] }
 					],
 					"seed": 9199004,
 					"overrideTilesetUid": null,
@@ -10146,7 +10219,7 @@
 						},
 						{
 							"__identifier": "Change_Area",
-							"__grid": [32,6],
+							"__grid": [31,6],
 							"__pivot": [0,0],
 							"__tags": ["region"],
 							"__tile": null,
@@ -10155,10 +10228,11 @@
 							"width": 1,
 							"height": 56,
 							"defUid": 451,
-							"px": [256,48],
+							"px": [255,48],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 4, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [4] }] },
-								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
+								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
@@ -10175,7 +10249,8 @@
 							"px": [24,144],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 6, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [6] }] },
-								{ "__identifier": "NextDir", "__value": 2, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [2] }] }
+								{ "__identifier": "NextDir", "__value": 2, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [2] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						}
 					]
@@ -10861,12 +10936,21 @@
 						{ "px": [8,48], "src": [88,72], "f": 0, "t": 119, "d": [373,193] },
 						{ "px": [8,72], "src": [88,72], "f": 2, "t": 119, "d": [373,289] },
 						{ "px": [72,128], "src": [32,64], "f": 0, "t": 100, "d": [366,521] },
+						{ "px": [80,128], "src": [32,64], "f": 0, "t": 100, "d": [366,522] },
+						{ "px": [88,128], "src": [32,64], "f": 0, "t": 100, "d": [366,523] },
 						{ "px": [96,128], "src": [32,64], "f": 0, "t": 100, "d": [366,524] },
 						{ "px": [104,128], "src": [32,64], "f": 0, "t": 100, "d": [366,525] },
 						{ "px": [112,128], "src": [32,64], "f": 0, "t": 100, "d": [366,526] },
+						{ "px": [120,128], "src": [32,64], "f": 0, "t": 100, "d": [366,527] },
+						{ "px": [128,128], "src": [32,64], "f": 0, "t": 100, "d": [366,528] },
+						{ "px": [136,128], "src": [32,64], "f": 0, "t": 100, "d": [366,529] },
+						{ "px": [144,128], "src": [32,64], "f": 0, "t": 100, "d": [366,530] },
+						{ "px": [152,128], "src": [32,64], "f": 0, "t": 100, "d": [366,531] },
+						{ "px": [160,128], "src": [32,64], "f": 0, "t": 100, "d": [366,532] },
 						{ "px": [168,128], "src": [32,64], "f": 0, "t": 100, "d": [366,533] },
 						{ "px": [176,128], "src": [32,64], "f": 0, "t": 100, "d": [366,534] },
 						{ "px": [184,128], "src": [32,64], "f": 0, "t": 100, "d": [366,535] },
+						{ "px": [192,128], "src": [32,64], "f": 0, "t": 100, "d": [366,536] },
 						{ "px": [200,128], "src": [32,64], "f": 0, "t": 100, "d": [366,537] },
 						{ "px": [208,128], "src": [32,64], "f": 0, "t": 100, "d": [366,538] },
 						{ "px": [216,128], "src": [32,64], "f": 0, "t": 100, "d": [366,539] },
@@ -10895,16 +10979,7 @@
 						{ "px": [216,120], "src": [32,80], "f": 0, "t": 124, "d": [370,507] },
 						{ "px": [224,120], "src": [32,80], "f": 0, "t": 124, "d": [370,508] },
 						{ "px": [232,120], "src": [32,80], "f": 0, "t": 124, "d": [370,509] },
-						{ "px": [240,120], "src": [32,80], "f": 0, "t": 124, "d": [370,510] },
-						{ "px": [80,128], "src": [32,72], "f": 0, "t": 112, "d": [367,522] },
-						{ "px": [88,128], "src": [32,72], "f": 0, "t": 112, "d": [367,523] },
-						{ "px": [120,128], "src": [32,72], "f": 0, "t": 112, "d": [367,527] },
-						{ "px": [128,128], "src": [32,72], "f": 0, "t": 112, "d": [367,528] },
-						{ "px": [136,128], "src": [32,72], "f": 0, "t": 112, "d": [367,529] },
-						{ "px": [144,128], "src": [32,72], "f": 0, "t": 112, "d": [367,530] },
-						{ "px": [152,128], "src": [32,72], "f": 0, "t": 112, "d": [367,531] },
-						{ "px": [160,128], "src": [32,72], "f": 0, "t": 112, "d": [367,532] },
-						{ "px": [192,128], "src": [32,72], "f": 0, "t": 112, "d": [367,536] }
+						{ "px": [240,120], "src": [32,80], "f": 0, "t": 124, "d": [370,510] }
 					],
 					"seed": 223691,
 					"overrideTilesetUid": null,
@@ -10987,12 +11062,13 @@
 							"px": [24,0],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 5, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [5] }] },
-								{ "__identifier": "NextDir", "__value": 0, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [0] }] }
+								{ "__identifier": "NextDir", "__value": 0, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [0] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
 							"__identifier": "Change_Area",
-							"__grid": [64,9],
+							"__grid": [63,9],
 							"__pivot": [0,0],
 							"__tags": ["region"],
 							"__tile": null,
@@ -11001,10 +11077,11 @@
 							"width": 1,
 							"height": 40,
 							"defUid": 451,
-							"px": [512,72],
+							"px": [511,72],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 7, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [7] }] },
-								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
+								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						}
 					]
@@ -12293,6 +12370,8 @@
 						{ "px": [456,88], "src": [88,72], "f": 1, "t": 119, "d": [373,761] },
 						{ "px": [464,88], "src": [88,72], "f": 2, "t": 119, "d": [373,762] },
 						{ "px": [16,120], "src": [88,72], "f": 2, "t": 119, "d": [373,962] },
+						{ "px": [344,120], "src": [32,64], "f": 0, "t": 100, "d": [366,1003] },
+						{ "px": [424,120], "src": [32,64], "f": 0, "t": 100, "d": [366,1013] },
 						{ "px": [88,112], "src": [32,56], "f": 0, "t": 88, "d": [368,907] },
 						{ "px": [128,112], "src": [32,56], "f": 0, "t": 88, "d": [368,912] },
 						{ "px": [144,112], "src": [32,56], "f": 0, "t": 88, "d": [368,914] },
@@ -12354,15 +12433,10 @@
 						{ "px": [464,120], "src": [32,80], "f": 0, "t": 124, "d": [370,1018] },
 						{ "px": [472,120], "src": [32,80], "f": 0, "t": 124, "d": [370,1019] },
 						{ "px": [480,120], "src": [32,80], "f": 0, "t": 124, "d": [370,1020] },
-						{ "px": [344,120], "src": [32,72], "f": 0, "t": 112, "d": [367,1003] },
-						{ "px": [424,120], "src": [32,72], "f": 0, "t": 112, "d": [367,1013] },
 						{ "px": [344,0], "src": [32,64], "f": 0, "t": 100, "d": [369,43] },
 						{ "px": [424,0], "src": [32,64], "f": 0, "t": 100, "d": [369,53] },
-						{ "px": [344,8], "src": [32,64], "f": 0, "t": 100, "d": [369,107] },
 						{ "px": [424,8], "src": [32,64], "f": 0, "t": 100, "d": [369,117] },
-						{ "px": [344,16], "src": [32,64], "f": 0, "t": 100, "d": [369,171] },
 						{ "px": [424,16], "src": [32,64], "f": 0, "t": 100, "d": [369,181] },
-						{ "px": [344,24], "src": [32,64], "f": 0, "t": 100, "d": [369,235] },
 						{ "px": [424,24], "src": [32,64], "f": 0, "t": 100, "d": [369,245] },
 						{ "px": [344,32], "src": [32,64], "f": 0, "t": 100, "d": [369,299] },
 						{ "px": [424,32], "src": [32,64], "f": 0, "t": 100, "d": [369,309] },
@@ -12375,17 +12449,20 @@
 						{ "px": [344,64], "src": [32,64], "f": 0, "t": 100, "d": [369,555] },
 						{ "px": [424,64], "src": [32,64], "f": 0, "t": 100, "d": [369,565] },
 						{ "px": [344,72], "src": [32,64], "f": 0, "t": 100, "d": [369,619] },
-						{ "px": [424,72], "src": [32,64], "f": 0, "t": 100, "d": [369,629] },
 						{ "px": [344,80], "src": [32,64], "f": 0, "t": 100, "d": [369,683] },
-						{ "px": [424,80], "src": [32,64], "f": 0, "t": 100, "d": [369,693] },
 						{ "px": [344,88], "src": [32,64], "f": 0, "t": 100, "d": [369,747] },
 						{ "px": [424,88], "src": [32,64], "f": 0, "t": 100, "d": [369,757] },
 						{ "px": [344,96], "src": [32,64], "f": 0, "t": 100, "d": [369,811] },
 						{ "px": [424,96], "src": [32,64], "f": 0, "t": 100, "d": [369,821] },
-						{ "px": [344,104], "src": [32,64], "f": 0, "t": 100, "d": [369,875] },
 						{ "px": [424,104], "src": [32,64], "f": 0, "t": 100, "d": [369,885] },
-						{ "px": [344,112], "src": [32,64], "f": 0, "t": 100, "d": [369,939] },
-						{ "px": [424,112], "src": [32,64], "f": 0, "t": 100, "d": [369,949] }
+						{ "px": [424,112], "src": [32,64], "f": 0, "t": 100, "d": [369,949] },
+						{ "px": [344,8], "src": [32,72], "f": 0, "t": 112, "d": [367,107] },
+						{ "px": [344,16], "src": [32,72], "f": 0, "t": 112, "d": [367,171] },
+						{ "px": [344,24], "src": [32,72], "f": 0, "t": 112, "d": [367,235] },
+						{ "px": [424,72], "src": [32,72], "f": 0, "t": 112, "d": [367,629] },
+						{ "px": [424,80], "src": [32,72], "f": 0, "t": 112, "d": [367,693] },
+						{ "px": [344,104], "src": [32,72], "f": 0, "t": 112, "d": [367,875] },
+						{ "px": [344,112], "src": [32,72], "f": 0, "t": 112, "d": [367,939] }
 					],
 					"seed": 2686056,
 					"overrideTilesetUid": null,
@@ -12468,12 +12545,13 @@
 							"px": [0,360],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 6, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [6] }] },
-								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
+								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
 							"__identifier": "Change_Area",
-							"__grid": [32,14],
+							"__grid": [31,14],
 							"__pivot": [0,0],
 							"__tags": ["region"],
 							"__tile": null,
@@ -12482,15 +12560,16 @@
 							"width": 1,
 							"height": 32,
 							"defUid": 451,
-							"px": [256,112],
+							"px": [255,112],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 8, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [8] }] },
-								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
+								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
 							"__identifier": "Change_Area",
-							"__grid": [32,38],
+							"__grid": [31,38],
 							"__pivot": [0,0],
 							"__tags": ["region"],
 							"__tile": null,
@@ -12499,10 +12578,11 @@
 							"width": 1,
 							"height": 32,
 							"defUid": 451,
-							"px": [256,304],
+							"px": [255,304],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 9, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [9] }] },
-								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
+								{ "__identifier": "NextDir", "__value": 1, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						}
 					]
@@ -14473,6 +14553,8 @@
 						{ "px": [72,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1673] },
 						{ "px": [80,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1674] },
 						{ "px": [88,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1675] },
+						{ "px": [96,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1676] },
+						{ "px": [104,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1677] },
 						{ "px": [112,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1678] },
 						{ "px": [120,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1679] },
 						{ "px": [128,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1680] },
@@ -14487,6 +14569,8 @@
 						{ "px": [200,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1689] },
 						{ "px": [208,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1690] },
 						{ "px": [216,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1691] },
+						{ "px": [224,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1692] },
+						{ "px": [232,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1693] },
 						{ "px": [240,416], "src": [32,64], "f": 0, "t": 100, "d": [366,1694] },
 						{ "px": [32,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1700] },
 						{ "px": [40,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1701] },
@@ -14494,6 +14578,9 @@
 						{ "px": [56,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1703] },
 						{ "px": [64,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1704] },
 						{ "px": [72,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1705] },
+						{ "px": [80,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1706] },
+						{ "px": [88,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1707] },
+						{ "px": [96,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1708] },
 						{ "px": [104,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1709] },
 						{ "px": [112,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1710] },
 						{ "px": [120,424], "src": [32,64], "f": 0, "t": 100, "d": [366,1711] },
@@ -14558,18 +14645,11 @@
 						{ "px": [224,408], "src": [32,80], "f": 0, "t": 124, "d": [370,1660] },
 						{ "px": [232,408], "src": [32,80], "f": 0, "t": 124, "d": [370,1661] },
 						{ "px": [240,408], "src": [32,80], "f": 0, "t": 124, "d": [370,1662] },
-						{ "px": [96,416], "src": [32,72], "f": 0, "t": 112, "d": [367,1676] },
-						{ "px": [104,416], "src": [32,72], "f": 0, "t": 112, "d": [367,1677] },
-						{ "px": [224,416], "src": [32,72], "f": 0, "t": 112, "d": [367,1692] },
-						{ "px": [232,416], "src": [32,72], "f": 0, "t": 112, "d": [367,1693] },
-						{ "px": [80,424], "src": [32,72], "f": 0, "t": 112, "d": [367,1706] },
-						{ "px": [88,424], "src": [32,72], "f": 0, "t": 112, "d": [367,1707] },
-						{ "px": [96,424], "src": [32,72], "f": 0, "t": 112, "d": [367,1708] },
 						{ "px": [168,208], "src": [32,64], "f": 0, "t": 100, "d": [369,853] },
-						{ "px": [168,216], "src": [32,64], "f": 0, "t": 100, "d": [369,885] },
 						{ "px": [168,224], "src": [32,64], "f": 0, "t": 100, "d": [369,917] },
 						{ "px": [168,232], "src": [32,64], "f": 0, "t": 100, "d": [369,949] },
-						{ "px": [168,240], "src": [32,64], "f": 0, "t": 100, "d": [369,981] }
+						{ "px": [168,240], "src": [32,64], "f": 0, "t": 100, "d": [369,981] },
+						{ "px": [168,216], "src": [32,72], "f": 0, "t": 112, "d": [367,885] }
 					],
 					"seed": 5915265,
 					"overrideTilesetUid": null,
@@ -14652,7 +14732,8 @@
 							"px": [0,112],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 7, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [7] }] },
-								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
+								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
@@ -14669,7 +14750,8 @@
 							"px": [112,288],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 9, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [9] }] },
-								{ "__identifier": "NextDir", "__value": 2, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [2] }] }
+								{ "__identifier": "NextDir", "__value": 2, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [2] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						}
 					]
@@ -16023,7 +16105,7 @@
 						{ "px": [168,248], "src": [32,64], "f": 0, "t": 100, "d": [369,1013] },
 						{ "px": [168,256], "src": [32,64], "f": 0, "t": 100, "d": [369,1045] },
 						{ "px": [168,264], "src": [32,64], "f": 0, "t": 100, "d": [369,1077] },
-						{ "px": [168,272], "src": [32,64], "f": 0, "t": 100, "d": [369,1109] }
+						{ "px": [168,272], "src": [32,72], "f": 0, "t": 112, "d": [367,1109] }
 					],
 					"seed": 8386488,
 					"overrideTilesetUid": null,
@@ -16092,7 +16174,8 @@
 							"px": [0,16],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 7, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [7] }] },
-								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
+								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
@@ -16109,7 +16192,8 @@
 							"px": [112,0],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 8, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [8] }] },
-								{ "__identifier": "NextDir", "__value": 0, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [0] }] }
+								{ "__identifier": "NextDir", "__value": 0, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [0] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
@@ -16126,7 +16210,8 @@
 							"px": [392,0],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 10, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [10] }] },
-								{ "__identifier": "NextDir", "__value": 0, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [0] }] }
+								{ "__identifier": "NextDir", "__value": 0, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [0] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						}
 					]
@@ -17328,6 +17413,7 @@
 						{ "px": [392,96], "src": [8,64], "f": 0, "t": 97, "d": [698,817] },
 						{ "px": [392,104], "src": [8,64], "f": 0, "t": 97, "d": [698,881] },
 						{ "px": [80,128], "src": [32,64], "f": 0, "t": 100, "d": [366,1034] },
+						{ "px": [168,128], "src": [32,64], "f": 0, "t": 100, "d": [366,1045] },
 						{ "px": [16,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1090] },
 						{ "px": [24,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1091] },
 						{ "px": [32,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1092] },
@@ -17335,14 +17421,24 @@
 						{ "px": [48,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1094] },
 						{ "px": [56,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1095] },
 						{ "px": [64,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1096] },
+						{ "px": [72,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1097] },
 						{ "px": [80,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1098] },
 						{ "px": [88,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1099] },
 						{ "px": [96,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1100] },
 						{ "px": [104,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1101] },
 						{ "px": [112,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1102] },
+						{ "px": [120,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1103] },
+						{ "px": [128,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1104] },
+						{ "px": [136,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1105] },
+						{ "px": [144,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1106] },
+						{ "px": [152,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1107] },
+						{ "px": [160,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1108] },
+						{ "px": [168,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1109] },
+						{ "px": [176,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1110] },
 						{ "px": [184,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1111] },
 						{ "px": [192,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1112] },
 						{ "px": [200,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1113] },
+						{ "px": [208,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1114] },
 						{ "px": [216,136], "src": [32,64], "f": 0, "t": 100, "d": [366,1115] },
 						{ "px": [112,120], "src": [32,56], "f": 0, "t": 88, "d": [368,974] },
 						{ "px": [120,120], "src": [32,56], "f": 0, "t": 88, "d": [368,975] },
@@ -17373,47 +17469,36 @@
 						{ "px": [208,128], "src": [32,80], "f": 0, "t": 124, "d": [370,1050] },
 						{ "px": [216,128], "src": [32,80], "f": 0, "t": 124, "d": [370,1051] },
 						{ "px": [8,136], "src": [32,80], "f": 0, "t": 124, "d": [370,1089] },
-						{ "px": [168,128], "src": [32,72], "f": 0, "t": 112, "d": [367,1045] },
-						{ "px": [72,136], "src": [32,72], "f": 0, "t": 112, "d": [367,1097] },
-						{ "px": [120,136], "src": [32,72], "f": 0, "t": 112, "d": [367,1103] },
-						{ "px": [128,136], "src": [32,72], "f": 0, "t": 112, "d": [367,1104] },
-						{ "px": [136,136], "src": [32,72], "f": 0, "t": 112, "d": [367,1105] },
-						{ "px": [144,136], "src": [32,72], "f": 0, "t": 112, "d": [367,1106] },
-						{ "px": [152,136], "src": [32,72], "f": 0, "t": 112, "d": [367,1107] },
-						{ "px": [160,136], "src": [32,72], "f": 0, "t": 112, "d": [367,1108] },
-						{ "px": [168,136], "src": [32,72], "f": 0, "t": 112, "d": [367,1109] },
-						{ "px": [176,136], "src": [32,72], "f": 0, "t": 112, "d": [367,1110] },
-						{ "px": [208,136], "src": [32,72], "f": 0, "t": 112, "d": [367,1114] },
 						{ "px": [80,8], "src": [32,64], "f": 0, "t": 100, "d": [369,74] },
 						{ "px": [168,8], "src": [32,64], "f": 0, "t": 100, "d": [369,85] },
 						{ "px": [80,16], "src": [32,64], "f": 0, "t": 100, "d": [369,138] },
-						{ "px": [168,16], "src": [32,64], "f": 0, "t": 100, "d": [369,149] },
 						{ "px": [80,24], "src": [32,64], "f": 0, "t": 100, "d": [369,202] },
-						{ "px": [168,24], "src": [32,64], "f": 0, "t": 100, "d": [369,213] },
 						{ "px": [80,32], "src": [32,64], "f": 0, "t": 100, "d": [369,266] },
-						{ "px": [168,32], "src": [32,64], "f": 0, "t": 100, "d": [369,277] },
-						{ "px": [80,40], "src": [32,64], "f": 0, "t": 100, "d": [369,330] },
-						{ "px": [168,40], "src": [32,64], "f": 0, "t": 100, "d": [369,341] },
-						{ "px": [80,48], "src": [32,64], "f": 0, "t": 100, "d": [369,394] },
 						{ "px": [168,48], "src": [32,64], "f": 0, "t": 100, "d": [369,405] },
-						{ "px": [80,56], "src": [32,64], "f": 0, "t": 100, "d": [369,458] },
 						{ "px": [168,56], "src": [32,64], "f": 0, "t": 100, "d": [369,469] },
 						{ "px": [80,64], "src": [32,64], "f": 0, "t": 100, "d": [369,522] },
-						{ "px": [168,64], "src": [32,64], "f": 0, "t": 100, "d": [369,533] },
 						{ "px": [80,72], "src": [32,64], "f": 0, "t": 100, "d": [369,586] },
-						{ "px": [168,72], "src": [32,64], "f": 0, "t": 100, "d": [369,597] },
-						{ "px": [80,80], "src": [32,64], "f": 0, "t": 100, "d": [369,650] },
-						{ "px": [168,80], "src": [32,64], "f": 0, "t": 100, "d": [369,661] },
-						{ "px": [80,88], "src": [32,64], "f": 0, "t": 100, "d": [369,714] },
-						{ "px": [168,88], "src": [32,64], "f": 0, "t": 100, "d": [369,725] },
-						{ "px": [80,96], "src": [32,64], "f": 0, "t": 100, "d": [369,778] },
 						{ "px": [168,96], "src": [32,64], "f": 0, "t": 100, "d": [369,789] },
-						{ "px": [80,104], "src": [32,64], "f": 0, "t": 100, "d": [369,842] },
 						{ "px": [168,104], "src": [32,64], "f": 0, "t": 100, "d": [369,853] },
-						{ "px": [80,112], "src": [32,64], "f": 0, "t": 100, "d": [369,906] },
-						{ "px": [168,112], "src": [32,64], "f": 0, "t": 100, "d": [369,917] },
-						{ "px": [80,120], "src": [32,64], "f": 0, "t": 100, "d": [369,970] },
-						{ "px": [168,120], "src": [32,64], "f": 0, "t": 100, "d": [369,981] }
+						{ "px": [168,16], "src": [32,72], "f": 0, "t": 112, "d": [367,149] },
+						{ "px": [168,24], "src": [32,72], "f": 0, "t": 112, "d": [367,213] },
+						{ "px": [168,32], "src": [32,72], "f": 0, "t": 112, "d": [367,277] },
+						{ "px": [80,40], "src": [32,72], "f": 0, "t": 112, "d": [367,330] },
+						{ "px": [168,40], "src": [32,72], "f": 0, "t": 112, "d": [367,341] },
+						{ "px": [80,48], "src": [32,72], "f": 0, "t": 112, "d": [367,394] },
+						{ "px": [80,56], "src": [32,72], "f": 0, "t": 112, "d": [367,458] },
+						{ "px": [168,64], "src": [32,72], "f": 0, "t": 112, "d": [367,533] },
+						{ "px": [168,72], "src": [32,72], "f": 0, "t": 112, "d": [367,597] },
+						{ "px": [80,80], "src": [32,72], "f": 0, "t": 112, "d": [367,650] },
+						{ "px": [168,80], "src": [32,72], "f": 0, "t": 112, "d": [367,661] },
+						{ "px": [80,88], "src": [32,72], "f": 0, "t": 112, "d": [367,714] },
+						{ "px": [168,88], "src": [32,72], "f": 0, "t": 112, "d": [367,725] },
+						{ "px": [80,96], "src": [32,72], "f": 0, "t": 112, "d": [367,778] },
+						{ "px": [80,104], "src": [32,72], "f": 0, "t": 112, "d": [367,842] },
+						{ "px": [80,112], "src": [32,72], "f": 0, "t": 112, "d": [367,906] },
+						{ "px": [168,112], "src": [32,72], "f": 0, "t": 112, "d": [367,917] },
+						{ "px": [80,120], "src": [32,72], "f": 0, "t": 112, "d": [367,970] },
+						{ "px": [168,120], "src": [32,72], "f": 0, "t": 112, "d": [367,981] }
 					],
 					"seed": 9550750,
 					"overrideTilesetUid": null,
@@ -17482,7 +17567,8 @@
 							"px": [136,288],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 9, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [9] }] },
-								{ "__identifier": "NextDir", "__value": 2, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [2] }] }
+								{ "__identifier": "NextDir", "__value": 2, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [2] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						},
 						{
@@ -17513,7 +17599,8 @@
 							"px": [256,0],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 11, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [11] }] },
-								{ "__identifier": "NextDir", "__value": 0, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [] }
+								{ "__identifier": "NextDir", "__value": 0, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						}
 					]
@@ -18836,7 +18923,8 @@
 							"px": [0,0],
 							"fieldInstances": [
 								{ "__identifier": "NextScreen", "__value": 10, "__type": "Int", "__tile": null, "defUid": 458, "realEditorValues": [{ "id": "V_Int", "params": [10] }] },
-								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
+								{ "__identifier": "NextDir", "__value": 3, "__type": "Int", "__tile": null, "defUid": 457, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
+								{ "__identifier": "GoTo", "__value": null, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [] }
 							]
 						}
 					]
