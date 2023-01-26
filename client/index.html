@@ -8,6 +8,17 @@
     <script src="./client/Game.js" type="module" defer></script>
     <link rel="stylesheet" href="./client/Game.css">
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <!-- Adobe fonts -->
+    <script>
+        (function(d) {
+            var config = {
+                kitId: 'stc0mih',
+                scriptTimeout: 3000,
+                async: true
+            },
+            h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+        })(document);
+    </script>
 
     <title>Food Impact</title>
 </head>
@@ -32,22 +43,47 @@
             <img id="mainfont-15" src="./client/sprites/font/main_font_15.png">
         </div>
         <div>
-            <img id="Screen_0" src="./client/levels/World1/png/Screen_0.png">
-            <img id="Screen_1" src="./client/levels/World1/png/Screen_1.png">
-            <img id="Screen_2" src="./client/levels/World1/png/Screen_2.png">
-            <img id="Screen_3" src="./client/levels/World1/png/Screen_3.png">
-            <img id="Screen_4" src="./client/levels/World1/png/Screen_4.png">
-            <img id="Screen_5" src="./client/levels/World1/png/Screen_5.png">
-            <img id="Screen_6" src="./client/levels/World1/png/Screen_6.png">
-            <img id="Screen_7" src="./client/levels/World1/png/Screen_7.png">
-            <img id="Screen_8" src="./client/levels/World1/png/Screen_8.png">
-            <img id="Screen_9" src="./client/levels/World1/png/Screen_9.png">
-            <img id="Screen_10" src="./client/levels/World1/png/Screen_10.png">
-            <img id="Screen_11" src="./client/levels/World1/png/Screen_11.png">
-            <img id="Screen_12" src="./client/levels/World1/png/Screen_12.png">
-            <img id="Screen_13" src="./client/levels/World1/png/Screen_13.png">
-            <img id="Screen_14" src="./client/levels/World1/png/Screen_14.png">
-            <img id="Screen_15" src="./client/levels/World1/png/Screen_15.png">
+            <img id="W1_Screen_0" src="./client/levels/World1/png/Screen_0.png">
+            <img id="W1_Screen_1" src="./client/levels/World1/png/Screen_1.png">
+            <img id="W1_Screen_2" src="./client/levels/World1/png/Screen_2.png">
+            <img id="W1_Screen_3" src="./client/levels/World1/png/Screen_3.png">
+            <img id="W1_Screen_4" src="./client/levels/World1/png/Screen_4.png">
+            <img id="W1_Screen_5" src="./client/levels/World1/png/Screen_5.png">
+            <img id="W1_Screen_6" src="./client/levels/World1/png/Screen_6.png">
+            <img id="W1_Screen_7" src="./client/levels/World1/png/Screen_7.png">
+            <img id="W1_Screen_8" src="./client/levels/World1/png/Screen_8.png">
+            <img id="W1_Screen_9" src="./client/levels/World1/png/Screen_9.png">
+            <img id="W1_Screen_10" src="./client/levels/World1/png/Screen_10.png">
+            <img id="W1_Screen_11" src="./client/levels/World1/png/Screen_11.png">
+            <img id="W1_Screen_12" src="./client/levels/World1/png/Screen_12.png">
+            <img id="W1_Screen_13" src="./client/levels/World1/png/Screen_13.png">
+            <img id="W1_Screen_14" src="./client/levels/World1/png/Screen_14.png">
+            <img id="W1_Screen_15" src="./client/levels/World1/png/Screen_15.png">
+
+            <img id="W2_Screen_0" src="./client/levels/World2/png/Screen_0.png">
+            <img id="W2_Screen_1" src="./client/levels/World2/png/Screen_1.png">
+            <img id="W2_Screen_2" src="./client/levels/World2/png/Screen_2.png">
+            <img id="W2_Screen_3" src="./client/levels/World2/png/Screen_3.png">
+            <img id="W2_Screen_4" src="./client/levels/World2/png/Screen_4.png">
+            <img id="W2_Screen_5" src="./client/levels/World2/png/Screen_5.png">
+            <img id="W2_Screen_6" src="./client/levels/World2/png/Screen_6.png">
+            <img id="W2_Screen_7" src="./client/levels/World2/png/Screen_7.png">
+            <img id="W2_Screen_8" src="./client/levels/World2/png/Screen_8.png">
+            <img id="W2_Screen_9" src="./client/levels/World2/png/Screen_9.png">
+            <img id="W2_Screen_10" src="./client/levels/World2/png/Screen_10.png">
+            <img id="W2_Screen_11" src="./client/levels/World2/png/Screen_11.png">
+            <img id="W2_Screen_12" src="./client/levels/World2/png/Screen_12.png">
+            <img id="W2_Screen_13" src="./client/levels/World2/png/Screen_13.png">
+            <img id="W2_Screen_14" src="./client/levels/World2/png/Screen_14.png">
+            <img id="W2_Screen_15" src="./client/levels/World2/png/Screen_15.png">
+            <img id="W2_Screen_16" src="./client/levels/World2/png/Screen_16.png">
+            <img id="W2_Screen_17" src="./client/levels/World2/png/Screen_17.png">
+            <img id="W2_Screen_18" src="./client/levels/World2/png/Screen_18.png">
+            <img id="W2_Screen_19" src="./client/levels/World2/png/Screen_19.png">
+            <img id="W2_Screen_20" src="./client/levels/World2/png/Screen_20.png">
+            <img id="W2_Screen_21" src="./client/levels/World2/png/Screen_21.png">
+            <img id="W2_Screen_22" src="./client/levels/World2/png/Screen_22.png">
+            <img id="W2_Screen_23" src="./client/levels/World2/png/Screen_23.png">
         </div>
         <img id="logo" src="./client/sprites/logo.png">
         <img id="settings" src="./client/sprites/menu/settings.png">
@@ -60,13 +96,37 @@
         <img id="p6" src="./client/sprites/p6.png">
         <img id="p7" src="./client/sprites/p7.png">
         <img id="p8" src="./client/sprites/p8.png">
+        <img id="food-0" src="./client/sprites/collectibleSprites/banana.png">
+        <img id="sign" src="./client/sprites/Sign.png">
     </section>
     <section id="content">
         <canvas class="game-layers" id="ui-layer" width="256" height="144"></canvas>
         <canvas class="game-layers" id="entity-layer" width="256" height="144"></canvas>
         <canvas class="game-layers" id="screen-layer" width="256" height="144"></canvas>
+        <canvas class="game-layers" id="text-layer" width="1920" height="1080"></canvas>
 
-        <span id="fps" style="color: white;z-index: 10;position: absolute;">-</span>
+        <div id="name-input">
+            <label for="name">Please input your name:</label>
+            <input id="name-type" type="text" size="10">
+            
+            <label for="name-color">Color:</label>
+            <select id="name-color" name="name-color">
+                <option value="0">Blue</option>
+                <option value="1">Red</option>
+                <option value="2">Yellow</option>
+                <option value="3">Green</option>
+                <option value="4">Orange</option>
+                <option value="5">Pink</option>
+                <option value="6">Purple</option>
+                <option value="7">Gray</option>
+            </select>
+
+            <input id="name-submit" type="submit" value="Submit">
+        </div>
+
+        <div id="names"></div>
+        
+        <span id="fps" style="z-index: 10; position: absolute;">-</span>
     </section>
 </body>
 </html>

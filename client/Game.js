@@ -1,18 +1,23 @@
 import { Lerp, Clamp } from './Util.js';
-import * as initWORLD from "./levels/World1.json" assert { type: "json" };
+import * as initWORLD from "./levels/World2.json" assert { type: "json" };
 
 console.clear();
 
 let WORLD = initWORLD.default;
+let WORLD_ID = 2;
 
 let socket = io();
 
 let SCREEN_HEIGHT = 144;
 let SCREEN_WIDTH = 256;
+let SCALE = 1;
+
+let DEFAULT_STRING = ` !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[/]^_abcdefghijklmnopqrstuvwxyz{|}~`;
 
 let ctxUI = document.getElementById("ui-layer").getContext("2d");
 let ctxEntity = document.getElementById("entity-layer").getContext("2d");
 let ctxScreen = document.getElementById("screen-layer").getContext("2d");
+let ctxText = document.getElementById("text-layer").getContext("2d");
 
 ctxEntity.imageSmoothingEnabled = false;
 ctxScreen.imageSmoothingEnabled = false;
@@ -23,11 +28,13 @@ var fps = document.getElementById("fps");
 var startTime = Date.now();
 var frame = 0;
 
+let touchSign = 0;
+
 let Physics = {
     grav: 200,
     accel: 200,
     deccel: 400,
-    maxSpd: 2000,
+    maxSpd: 1500,
     jumpSpd: -3000,
     fallSpd: 4000,
 }
@@ -46,9 +53,53 @@ let keys = [
 let BTN = [0,0,0,0,0,0,0,0];
 let AXIS = [0,0];
 let localID = null;
-let localPlayer = null;
+let localPlayer = {
+    id: null,
+    color: null,
+    name: "localName",
+    w: 7,
+    h: 7,
+    screen: null,
+    xSpd: 0,
+    ySpd: 0,
+    BTN: [0,0,0,0],
+    AXIS: [0,0],
+    lastState: 0,
+    bananaCounter: 0,
+    // animation
+    facing: 1,
+    s: 0,
+    si: 0,
+    sr: 0,
+    st: 0,
+    animID: 0,
+    // states
+    canJump: 0,
+    maxJumps: 1,
+    canDash: 0,
+    dashTimer: 0,
+    dashDir: 0,
+    isDashing: 0,
+    isStunned: 1,
+    isOnWall: false,
+    isOnGround: false,
+    // timer
+    wallJumpDelay: 0,
+
+    cam: {
+        x: 0,
+        y: 0
+    }
+};
+let localName = null;
+let localColor = null;
 let PLAYER_LIST = [];
 let connected = 0;
+
+let text = [
+    "COLLECT ALL THE BANANAS TO OPEN THE FINAL LEVEL",
+    "NOTHING TO DO HERE..."
+]
 
 function startTimer() {
     resize();
@@ -59,7 +110,18 @@ socket.on('initClient', function(data) {
     localID = data.localID;
     PLAYER_LIST = data.PLAYER_LIST;
     connected = 1;
-    localPlayer = data.localPlayer;
+
+    let l = WORLD.levels[data.screenID].layerInstances[0].entityInstances.find(({ __identifier }) => __identifier === "Player");
+
+    localPlayer.id = data.localID;
+    //localPlayer.color = data.localID;
+    localPlayer.screen = data.screenID;
+    localPlayer.x = l.px[0];
+    localPlayer.y = l.px[1];
+    localPlayer.xInt = localPlayer.x;
+    localPlayer.yInt = localPlayer.y;
+    localPlayer.enteredX = localPlayer.x;
+    localPlayer.enteredY = localPlayer.y;
 });
 
 socket.on('updateClient', function(data) {
@@ -73,12 +135,20 @@ socket.on('updateClient', function(data) {
 
 function update() {
     tick();
-    if (connected == 1) {
+
+    if (localName == "") {
+
+    } else if (localColor == "") {
+        
+    } else if (connected == 1) {
         playerUpdate(localPlayer);
 
         let pack = {
             id: localPlayer.id,
+            name: localPlayer.name,
             color: localPlayer.color,
+            x: localPlayer.x,
+            y: localPlayer.y,
             xInt: localPlayer.xInt,
             yInt: localPlayer.yInt,
             w: 7,
@@ -104,64 +174,104 @@ function draw() {
     ctxUI.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     let cam = localPlayer.cam;
-    cam.img = document.getElementById(`Screen_${localPlayer.screen}`);
+    cam.img = document.getElementById(`W${WORLD_ID}_Screen_${localPlayer.screen}`);
     ctxScreen.drawImage(cam.img,cam.x,cam.y,SCREEN_WIDTH,SCREEN_HEIGHT,0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
     
+    for (let i of WORLD.levels[PLAYER_LIST[localID].screen].layerInstances[0].entityInstances) {
+        if (i.__identifier == "Collectable" && i.fieldInstances[1].__value == 0) {
+            let img = document.getElementById(`food-${i.fieldInstances[0].__value}`);
+            ctxEntity.drawImage(img,0,0,8,8,i.px[0] - cam.x,i.px[1] - cam.y,8,8);
+        } else if (i.__identifier == "Sign") {
+            let img = document.getElementById(`sign`);
+            ctxEntity.drawImage(img,0,0,8,8,i.px[0] - cam.x,i.px[1] - cam.y,8,8);
+            if (touchSign) { drawText(text[i.fieldInstances[0].__value], 16, 32, 7); }
+        }
+    }
+
     // Draw players
     for (let i = 0; i < PLAYER_LIST.length; i++) {
         let p = PLAYER_LIST[i];
         if (p != null && p.screen == PLAYER_LIST[localID].screen) {
+            // Draw name
+            let txt = document.getElementById(`p${i}-name`);
+            if (txt == null) {
+                let txt = document.createElement("span");
+                txt.className = "player-names";
+                txt.id = `p${i}-name`;
+                document.getElementById("names").append(txt);
+            }
+            txt.innerHTML = p.name;
+            txt.style.display = "block";
+            txt.style.left = `${Math.floor((p.x+4 - cam.x) * SCALE) - Math.floor(txt.getBoundingClientRect().width/2)}px`;
+            txt.style.top = `${Math.floor((p.y - cam.y) * SCALE) - 24}px`;
+            // Draw player
             let img = document.getElementById(`p${p.color}`);
             ctxEntity.drawImage(img,8 * p.si,8 * p.sr,8,8,p.xInt - cam.x, p.yInt - cam.y,8,8);
+        } else {
+            let txt = document.getElementById(`p${i}-name`);
+            if (txt != null) { txt.style.display = "none"; }
         }
     }
+    let img = document.getElementById(`food-0`);
+    ctxEntity.drawImage(img,0,0,8,8,2,8,8,8);
+    drawText(localPlayer.bananaCounter.toString(), 11, 10, 7);
 }
 
 function changeKey(key, state) {
-    let k = key.toLowerCase();
+    if (key != undefined) {
+        let k = key.toLowerCase();
 
-    for (let i = 0; i < keys.length; i++) {
-        if (k == keys[i] &&
-            (BTN[i] == 0 ||
-            BTN[i] == 1 ||
-            (BTN[i] == -1 && state == 0))) {
-            BTN[i] = state;
+        for (let i = 0; i < keys.length; i++) {
+            if (k == keys[i] &&
+                (BTN[i] == 0 ||
+                BTN[i] == 1 ||
+                (BTN[i] == -1 && state == 0))) {
+                BTN[i] = state;
+            }
         }
-    }
-    
-    // Set axis
-    if (BTN[0]>0 && !BTN[1]) {
-        AXIS[0] = -1;
-    } else if (!BTN[0] && BTN[1]>0) {
-        AXIS[0] = 1;
-    } else if ((!BTN[0] && !BTN[1]) || (BTN[0]>0 && BTN[1]>0)) {
-        AXIS[0] = 0;
-    }
-    
-    if (BTN[2]>0 && !BTN[3]) {
-        AXIS[1] = -1;
-    } else if (!BTN[2] && BTN[3]>0) {
-        AXIS[1] = 1;
-    } else if ((!BTN[2] && !BTN[3]) || (BTN[2]>0 && BTN[3]>0)) {
-        AXIS[1] = 0;
+        
+        // Set axis
+        if (BTN[0]>0 && !BTN[1]) {
+            AXIS[0] = -1;
+        } else if (!BTN[0] && BTN[1]>0) {
+            AXIS[0] = 1;
+        } else if ((!BTN[0] && !BTN[1]) || (BTN[0]>0 && BTN[1]>0)) {
+            AXIS[0] = 0;
+        }
+        
+        if (BTN[2]>0 && !BTN[3]) {
+            AXIS[1] = -1;
+        } else if (!BTN[2] && BTN[3]>0) {
+            AXIS[1] = 1;
+        } else if ((!BTN[2] && !BTN[3]) || (BTN[2]>0 && BTN[3]>0)) {
+            AXIS[1] = 0;
+        }
     }
 }
 
 document.addEventListener("keydown", function(e) { changeKey(e.key, 1) });
 document.addEventListener("keyup", function(e) { changeKey(e.key, 0) });
 window.addEventListener("resize", resize);
+document.getElementById("name-submit").addEventListener("click", function() {
+    localPlayer.name = document.getElementById("name-type").value;
+    localPlayer.color = document.getElementById("name-color").value;
+    document.getElementById("name-input").style.display = "none";
+    socket.emit('submitPlayer', localPlayer.name);
+});
 
 function resize() {
     let winW = window.innerHeight / SCREEN_HEIGHT;
     let winH = window.innerWidth / SCREEN_WIDTH;
-    let SCALE = Math.min(winW,winH);
+    SCALE = Math.min(winW,winH);
     
     const layer = document.querySelectorAll('.game-layers');
     
     layer.forEach(l => {
-        l.style.width = `${SCALE * SCREEN_WIDTH}px`;
-        l.style.height = `${SCALE * SCREEN_HEIGHT}px`;
+        l.style.width = `${Math.floor(SCALE * SCREEN_WIDTH)}px`;
+        l.style.height = `${Math.floor(SCALE * SCREEN_HEIGHT)}px`;
     });
+
+    document.getElementById("name-input").style.width =`${Math.floor(SCALE * SCREEN_WIDTH)}px`;
 }
 
 function tick() {
@@ -177,6 +287,7 @@ function tick() {
 window.onload = startTimer();
 
 function playerUpdate(p) {
+    touchSign = 0;
     /* -------------------------------------------------------------------------- */
     /*                               Player movement                              */
     /* -------------------------------------------------------------------------- */
@@ -191,11 +302,14 @@ function playerUpdate(p) {
     }
     p.wallJumpDelay = Math.max(p.wallJumpDelay-1,0);
 
+    if (AXIS[1] != 0) { p.facing = AXIS[1] }
+
     // Collision with lava
     if (Touching(p, p.x, p.y, 2) && !p.isDashing) {
         p.x = p.enteredX;
         p.y = p.enteredY;
     }
+    // In water
     if (Touching(p, p.x, p.y, 3)) {
         p.grav = 25;
         p.accel = 100;
@@ -205,6 +319,7 @@ function playerUpdate(p) {
         p.fallSpd = 1000;
         p.lastState = 3;
         p.canJump = 1;
+        p.canDash = 1;
     } else {
         p.grav = Physics.grav;
         p.accel = Physics.accel;
@@ -219,23 +334,26 @@ function playerUpdate(p) {
     if (p.canDash && BTN[6]>0) {
         BTN[6] = -1;
         p.isDashing = 1;
-        p.dashTimer = 8;
+        p.dashTimer = 12;
+        p.xSpd = 3000 * p.facing;
+        p.ySpd = 0;
     }
 
     if (p.isDashing) {
-        p.color = 8;
-        p.xSpd = 5000 * p.facing;
-        p.ySpd = 0;
-        p.maxSpd = 5000;
+        // diagonal is * 0.707 or 2121;
+        p.grav = 0;
+        p.maxSpd = 3000;
         p.canDash = 0;
         p.dashTimer = Math.max(p.dashTimer-1,0);
         if (p.dashTimer == 0) {
-            p.color = p.id;
+            p.xSpd = 0;
+            p.ySpd = 0;
+            p.grav = Physics.grav;
             p.isDashing = 0;
         }
     }
     
-    checkScreenChange(p);
+    entityCollisions(p);
 
     if (!p.wallJumpDelay) {
         // Accelerate
@@ -254,7 +372,6 @@ function playerUpdate(p) {
     }
     if (Touching(p, p.x + (1 * Math.sign(p.xSpd)), p.y, 1)) {
         p.isOnWall = 1;
-        p.canDash = 1;
     }
     else { p.isOnWall = 0; }
     
@@ -299,14 +416,8 @@ function playerUpdate(p) {
     /* -------------------------------------------------------------------------- */
 
     // Set rotation
-    if (p.xSpd > 0) {
-        p.sr = 0;
-        p.facing = 1;
-    }
-    else if (p.xSpd < 0) {
-        p.sr = 1;
-        p.facing = -1;
-    }
+    if (p.xSpd > 0) { p.sr = 0; }
+    else if (p.xSpd < 0) { p.sr = 1; }
 
     // EMOTE
     if (p.isOnGround && !p.xSpd && AXIS[0] == 1) {
@@ -365,40 +476,52 @@ function jump(p) {
     p.ySpd = p.jumpSpd;
     BTN[5] = -1;
     p.canJump = Math.max(p.canJump-1,0);
+    p.canDash = 1;
+    p.dashTimer = 0;
+    p.isDashing = 0;
 }
 
-function checkScreenChange(obj) {
+function entityCollisions(obj) {
     let x = [0,0,0,0];
     let y = [0,0,0,0];
 
     let l = WORLD.levels[obj.screen].layerInstances[0].entityInstances;
 
     for (let i of l) {
-        if (i.__identifier == "Change_Area") {
-            x[0] = obj.x;
-            x[1] = obj.x + obj.w;
-            x[2] = i.px[0];
-            x[3] = i.px[0] + i.width;
-            y[0] = obj.y;
-            y[1] = obj.y + obj.h;
-            y[2] = i.px[1];
-            y[3] = i.px[1] + i.height;
-
-            if (
-                x[0] <= x[3] &&
-                x[1] >= x[2] &&
-                y[0] <= y[3] &&
-                y[1] >= y[2]) {
+        x[0] = obj.x;
+        x[1] = obj.x + obj.w;
+        x[2] = i.px[0];
+        x[3] = i.px[0] + i.width;
+        y[0] = obj.y;
+        y[1] = obj.y + obj.h;
+        y[2] = i.px[1];
+        y[3] = i.px[1] + i.height;
+        
+    
+        if (x[0] <= x[3] &&
+            x[1] >= x[2] &&
+            y[0] <= y[3] &&
+            y[1] >= y[2]) {
+            if (i.__identifier == "Collectable" && !i.fieldInstances[1].__value) {
+                i.fieldInstances[1].__value = 1;
+                localPlayer.bananaCounter++;
+            } else if (i.__identifier == "Change_Area") {
                 let nextScreen = i.fieldInstances[0].__value;
                 let nextDir = i.fieldInstances[1].__value;
+                let ol = WORLD.levels[nextScreen].layerInstances[0].entityInstances.find(({ iid }) => iid == i.fieldInstances[2].__value.entityIid);
+                let newX = obj.x - i.px[0] + ol.px[0];
+                let newY = obj.y - i.px[1] + ol.px[1];
+                
                 obj.screen = nextScreen;
-                if (nextDir == 1) { obj.x = 2; }
-                if (nextDir == 3) { obj.x = 246; }
-                if (nextDir == 0) { obj.y = 134; }
-                if (nextDir == 2) { obj.y = 2; }
-
+                if (nextDir == 1) { obj.x = ol.px[0] + 2; obj.y = newY; }
+                if (nextDir == 3) { obj.x = ol.px[0] - 8; obj.y = newY; }
+                if (nextDir == 0) { obj.y = ol.px[1] - 8; obj.x = newX; }
+                if (nextDir == 2) { obj.y = ol.px[1] + 2; obj.x = newX; }
+    
                 obj.enteredX = obj.x;
                 obj.enteredY = obj.y;
+            } else if (i.__identifier == "Sign") {
+                touchSign = 1;
             }
         }
     }
@@ -441,4 +564,17 @@ function Touching(obj, x, y, checkFor) {
         return checkFor;
     }
     return 0;
+}
+
+function drawText(text, x, y, clr) {
+    clr = clr || 0;
+    let fontImg = document.getElementById(`mainfont-${clr}`);
+
+    for (let i = 0; i < text.length; i++) {
+        let char = text.charAt(i);
+        
+        if (char != " ") {
+            ctxEntity.drawImage(fontImg, DEFAULT_STRING.indexOf(char) * 4, 0, 4, 5, x + (i * 4), y, 4, 5);
+        }
+    }
 }
