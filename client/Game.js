@@ -98,7 +98,8 @@ let connected = 0;
 
 let text = [
     "COLLECT ALL THE BANANAS TO OPEN THE FINAL LEVEL",
-    "NOTHING TO DO HERE..."
+    "NOTHING TO DO HERE...",
+    "VERY OMINOUS"
 ]
 
 function startTimer() {

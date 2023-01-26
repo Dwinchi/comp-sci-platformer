@@ -25239,7 +25239,7 @@
 									"entityIid": "a5f03c10-7820-11ed-b9a8-6100ccf2277a",
 									"layerIid": "404b9741-7820-11ed-9a99-fd3131d04752",
 									"levelIid": "404b9740-7820-11ed-9a99-d95714a64b1d",
-									"worldIid": "6e0b7840-7820-11ed-8957-e36e5dcf6e19"
+									"worldIid": "775040b0-7820-11ed-8957-c3406cb046ce"
 								}, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["a5f03c10-7820-11ed-b9a8-6100ccf2277a"]
@@ -25265,7 +25265,7 @@
 									"entityIid": "e8ce9cc0-7820-11ed-b9a8-cb9192bc21b1",
 									"layerIid": "501b1450-7820-11ed-b9a8-21fab0f44e54",
 									"levelIid": "501aed40-7820-11ed-b9a8-f12155b3f46a",
-									"worldIid": "6e0b7840-7820-11ed-8957-e36e5dcf6e19"
+									"worldIid": "775040b0-7820-11ed-8957-c3406cb046ce"
 								}, "__type": "EntityRef", "__tile": null, "defUid": 700, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["e8ce9cc0-7820-11ed-b9a8-cb9192bc21b1"]
@@ -25302,6 +25302,20 @@
 							"defUid": 149,
 							"px": [88,128],
 							"fieldInstances": []
+						},
+						{
+							"__identifier": "Sign",
+							"__grid": [34,15],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 68, "x": 0, "y": 56, "w": 8, "h": 8 },
+							"__smartColor": "#733E39",
+							"iid": "434f0ab0-7820-11ed-8957-03e8735e5f2d",
+							"width": 8,
+							"height": 8,
+							"defUid": 726,
+							"px": [272,120],
+							"fieldInstances": [{ "__identifier": "Text", "__value": 2, "__type": "Int", "__tile": null, "defUid": 727, "realEditorValues": [{ "id": "V_Int", "params": [2] }] }]
 						}
 					]
 				},
