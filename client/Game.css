@@ -42,6 +42,11 @@ body {
     position: relative;
 }
 
+#name-warn {
+    display: none;
+    color: red;
+}
+
 input[type=text], select {
     width: 100%;
     padding: 12px 20px;

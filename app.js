@@ -35,6 +35,7 @@ io.sockets.on('connection', function(socket) {
         SOCKET_LIST[socket.id] = socket;
         PLAYER_LIST[socket.playerID] = null;
         let pack = {
+            socketID: socket.id,
             localID: socket.playerID,
             screenID: Game.screenID,
             PLAYER_LIST: PLAYER_LIST
@@ -47,6 +48,8 @@ io.sockets.on('connection', function(socket) {
             console.log(`Player ${socket.name} has disconnected`);
         }
         delete SOCKET_LIST[socket.id];
+        /* PLAYER_LIST.splice(PLAYER_LIST.indexOf(PLAYER_LIST.find(({ socketID }) => socketID === socket.id)),1);
+        console.log(PLAYER_LIST); */
         delete PLAYER_LIST[socket.playerID];
     });
 

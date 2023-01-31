@@ -47,15 +47,16 @@ let keys = [
     "enter",
     "z",
     "x",
-    "c",
+    "m"
 ]
 
 let BTN = [0,0,0,0,0,0,0,0];
 let AXIS = [0,0];
 let localID = null;
 let localPlayer = {
-    id: null,
+    playerID: null,
     color: null,
+    colorSave: null,
     name: "localName",
     w: 7,
     h: 7,
@@ -98,7 +99,12 @@ let connected = 0;
 
 let text = [
     "COLLECT ALL THE BANANAS TO OPEN THE FINAL LEVEL",
-    "NOTHING TO DO HERE..."
+    "NOTHING TO DO HERE...",
+    "VERY OMINOUS",
+    "PRESS UP TO GO THROUGH DOOR",
+    "CONGRATS",
+    "YOU DIDN'T THINK THIS WAS THE END, DID YOU?",
+    "NOW SUFFER",
 ]
 
 function startTimer() {
@@ -112,9 +118,9 @@ socket.on('initClient', function(data) {
     connected = 1;
 
     let l = WORLD.levels[data.screenID].layerInstances[0].entityInstances.find(({ __identifier }) => __identifier === "Player");
-
-    localPlayer.id = data.localID;
-    //localPlayer.color = data.localID;
+    
+    localPlayer.socketID = data.socketID;
+    localPlayer.playerID = data.localID;
     localPlayer.screen = data.screenID;
     localPlayer.x = l.px[0];
     localPlayer.y = l.px[1];
@@ -126,25 +132,29 @@ socket.on('initClient', function(data) {
 
 socket.on('updateClient', function(data) {
     // Update players
+    PLAYER_LIST = data.players;
+    PLAYER_LIST[PLAYER_LIST.indexOf(PLAYER_LIST.find(({ socketID }) => socketID === socketID))] = localPlayer;
+    
     for (let i = 0; i < data.players.length; i++) {
         if (i != localID) {
             PLAYER_LIST[i] = data.players[i]
         }
     }
+
+    //console.log(PLAYER_LIST);
 });
 
 function update() {
     tick();
 
-    if (localName == "") {
+    if (connected == 1) {
+        //let id = PLAYER_LIST.indexOf(PLAYER_LIST.find(({ socketID }) => socketID === socketID));
 
-    } else if (localColor == "") {
-        
-    } else if (connected == 1) {
         playerUpdate(localPlayer);
 
         let pack = {
-            id: localPlayer.id,
+            socketID: localPlayer.socketID,
+            playerID: localPlayer.playerID,
             name: localPlayer.name,
             color: localPlayer.color,
             x: localPlayer.x,
@@ -184,13 +194,18 @@ function draw() {
         } else if (i.__identifier == "Sign") {
             let img = document.getElementById(`sign`);
             ctxEntity.drawImage(img,0,0,8,8,i.px[0] - cam.x,i.px[1] - cam.y,8,8);
-            if (touchSign) { drawText(text[i.fieldInstances[0].__value], 16, 32, 7); }
+            if (touchSign) {
+                let img = document.getElementById(`textbox`);
+                ctxUI.drawImage(img,16,16);
+                drawText(touchSign, 26, 21, 7, 1); 
+            }
         }
     }
 
     // Draw players
     for (let i = 0; i < PLAYER_LIST.length; i++) {
         let p = PLAYER_LIST[i];
+        console.log(PLAYER_LIST.length);
         if (p != null && p.screen == PLAYER_LIST[localID].screen) {
             // Draw name
             let txt = document.getElementById(`p${i}-name`);
@@ -215,76 +230,13 @@ function draw() {
     let img = document.getElementById(`food-0`);
     ctxEntity.drawImage(img,0,0,8,8,2,8,8,8);
     drawText(localPlayer.bananaCounter.toString(), 11, 10, 7);
-}
-
-function changeKey(key, state) {
-    if (key != undefined) {
-        let k = key.toLowerCase();
-
-        for (let i = 0; i < keys.length; i++) {
-            if (k == keys[i] &&
-                (BTN[i] == 0 ||
-                BTN[i] == 1 ||
-                (BTN[i] == -1 && state == 0))) {
-                BTN[i] = state;
-            }
-        }
-        
-        // Set axis
-        if (BTN[0]>0 && !BTN[1]) {
-            AXIS[0] = -1;
-        } else if (!BTN[0] && BTN[1]>0) {
-            AXIS[0] = 1;
-        } else if ((!BTN[0] && !BTN[1]) || (BTN[0]>0 && BTN[1]>0)) {
-            AXIS[0] = 0;
-        }
-        
-        if (BTN[2]>0 && !BTN[3]) {
-            AXIS[1] = -1;
-        } else if (!BTN[2] && BTN[3]>0) {
-            AXIS[1] = 1;
-        } else if ((!BTN[2] && !BTN[3]) || (BTN[2]>0 && BTN[3]>0)) {
-            AXIS[1] = 0;
-        }
+    
+    if (BTN[7]) {
+        // Map
+        let img = document.getElementById(`map`);
+        ctxUI.drawImage(img,0,0);
     }
 }
-
-document.addEventListener("keydown", function(e) { changeKey(e.key, 1) });
-document.addEventListener("keyup", function(e) { changeKey(e.key, 0) });
-window.addEventListener("resize", resize);
-document.getElementById("name-submit").addEventListener("click", function() {
-    localPlayer.name = document.getElementById("name-type").value;
-    localPlayer.color = document.getElementById("name-color").value;
-    document.getElementById("name-input").style.display = "none";
-    socket.emit('submitPlayer', localPlayer.name);
-});
-
-function resize() {
-    let winW = window.innerHeight / SCREEN_HEIGHT;
-    let winH = window.innerWidth / SCREEN_WIDTH;
-    SCALE = Math.min(winW,winH);
-    
-    const layer = document.querySelectorAll('.game-layers');
-    
-    layer.forEach(l => {
-        l.style.width = `${Math.floor(SCALE * SCREEN_WIDTH)}px`;
-        l.style.height = `${Math.floor(SCALE * SCREEN_HEIGHT)}px`;
-    });
-
-    document.getElementById("name-input").style.width =`${Math.floor(SCALE * SCREEN_WIDTH)}px`;
-}
-
-function tick() {
-    var time = Date.now();
-    frame++;
-    if (time - startTime > 1000) {
-        fps.innerHTML = (frame / ((time - startTime) / 1000)).toFixed(1);
-        startTime = time;
-        frame = 0;
-    }
-}
-
-window.onload = startTimer();
 
 function playerUpdate(p) {
     touchSign = 0;
@@ -295,11 +247,9 @@ function playerUpdate(p) {
         p.isOnGround = 1;
         p.canJump = p.maxJumps;
         p.canDash = 1;
+        p.color = p.colorSave;
     }
-    else {
-        p.isOnGround = 0;
-        p.canJump = 0; // Just one jump
-    }
+    else { p.isOnGround = 0; }
     p.wallJumpDelay = Math.max(p.wallJumpDelay-1,0);
 
     if (AXIS[1] != 0) { p.facing = AXIS[1] }
@@ -315,7 +265,7 @@ function playerUpdate(p) {
         p.accel = 100;
         p.deccel = 200;
         p.maxSpd = 1000;
-        p.jumpSpd = -750;
+        p.jumpSpd = -1500;
         p.fallSpd = 1000;
         p.lastState = 3;
         p.canJump = 1;
@@ -337,6 +287,7 @@ function playerUpdate(p) {
         p.dashTimer = 12;
         p.xSpd = 3000 * p.facing;
         p.ySpd = 0;
+        p.color = 8;
     }
 
     if (p.isDashing) {
@@ -380,7 +331,9 @@ function playerUpdate(p) {
         p.wallJumpDelay = 1;
         p.isOnWall = 0;
         p.xSpd = -Math.sign(p.xSpd) * p.maxSpd;
-        jump(p);
+        p.ySpd = p.jumpSpd;
+        BTN[5] = -1;
+        //jump(p);
     }
     // Jump
     if (BTN[5]>0 && p.canJump) { jump(p); }
@@ -476,10 +429,86 @@ function jump(p) {
     p.ySpd = p.jumpSpd;
     BTN[5] = -1;
     p.canJump = Math.max(p.canJump-1,0);
-    p.canDash = 1;
+    //p.canDash = 1;
     p.dashTimer = 0;
     p.isDashing = 0;
 }
+
+function changeKey(key, state) {
+    if (key != undefined) {
+        let k = key.toLowerCase();
+
+        for (let i = 0; i < keys.length; i++) {
+            if (k == keys[i] &&
+                (BTN[i] == 0 ||
+                BTN[i] == 1 ||
+                (BTN[i] == -1 && state == 0))) {
+                BTN[i] = state;
+            }
+        }
+        
+        // Set axis
+        if (BTN[0]>0 && !BTN[1]) {
+            AXIS[0] = -1;
+        } else if (!BTN[0] && BTN[1]>0) {
+            AXIS[0] = 1;
+        } else if ((!BTN[0] && !BTN[1]) || (BTN[0]>0 && BTN[1]>0)) {
+            AXIS[0] = 0;
+        }
+        
+        if (BTN[2]>0 && !BTN[3]) {
+            AXIS[1] = -1;
+        } else if (!BTN[2] && BTN[3]>0) {
+            AXIS[1] = 1;
+        } else if ((!BTN[2] && !BTN[3]) || (BTN[2]>0 && BTN[3]>0)) {
+            AXIS[1] = 0;
+        }
+    }
+}
+
+document.addEventListener("keydown", function(e) { changeKey(e.key, 1) });
+document.addEventListener("keyup", function(e) { changeKey(e.key, 0) });
+window.addEventListener("resize", resize);
+document.getElementById("name-submit").addEventListener("click", function() {
+    let name = document.getElementById("name-type").value;
+    if (name != "" && name.length <= 32) {
+        localPlayer.name = name;
+        localPlayer.color = document.getElementById("name-color").value;
+        localPlayer.colorSave = localPlayer.color;
+        document.getElementById("name-input").style.display = "none";
+        socket.emit('submitPlayer', localPlayer.name);
+    } else {
+        document.getElementById("name-warn").style.display = "block";
+    }
+});
+
+function resize() {
+    let winW = window.innerHeight / SCREEN_HEIGHT;
+    let winH = window.innerWidth / SCREEN_WIDTH;
+    SCALE = Math.min(winW,winH);
+    
+    const layer = document.querySelectorAll('.game-layers');
+    
+    layer.forEach(l => {
+        l.style.width = `${Math.floor(SCALE * SCREEN_WIDTH)}px`;
+        l.style.height = `${Math.floor(SCALE * SCREEN_HEIGHT)}px`;
+    });
+
+    document.getElementById("name-input").style.width =`${Math.floor(SCALE * SCREEN_WIDTH)}px`;
+}
+
+function tick() {
+    var time = Date.now();
+    frame++;
+    if (time - startTime > 1000) {
+        fps.innerHTML = (frame / ((time - startTime) / 1000)).toFixed(1);
+        startTime = time;
+        frame = 0;
+    }
+}
+
+window.onload = startTimer();
+
 
 function entityCollisions(obj) {
     let x = [0,0,0,0];
@@ -521,7 +550,23 @@ function entityCollisions(obj) {
                 obj.enteredX = obj.x;
                 obj.enteredY = obj.y;
             } else if (i.__identifier == "Sign") {
-                touchSign = 1;
+                touchSign = text[i.fieldInstances[0].__value];
+            } else if (i.__identifier == "DoubleJump") {
+                obj.maxJumps = 2;
+            } else if (i.__identifier == "Door" && BTN[0]>0) {
+                BTN[0] = -1;
+                let nextScreen = i.fieldInstances[0].__value;
+                let ol = WORLD.levels[nextScreen].layerInstances[0].entityInstances.find(({ iid }) => iid == i.fieldInstances[1].__value.entityIid);
+                let newX = ol.px[0];
+                let newY = ol.px[1] + 8;
+                obj.screen = nextScreen;
+                obj.x = newX;
+                obj.y = newY;
+
+                obj.enteredX = obj.x;
+                obj.enteredY = obj.y;
+            } else if (i.__identifier == "JumpCrystal") {
+                canDash = 1;
             }
         }
     }
@@ -566,15 +611,16 @@ function Touching(obj, x, y, checkFor) {
     return 0;
 }
 
-function drawText(text, x, y, clr) {
+function drawText(text, x, y, clr, mode) {
     clr = clr || 0;
+    mode = mode || 0;
     let fontImg = document.getElementById(`mainfont-${clr}`);
 
     for (let i = 0; i < text.length; i++) {
         let char = text.charAt(i);
         
         if (char != " ") {
-            ctxEntity.drawImage(fontImg, DEFAULT_STRING.indexOf(char) * 4, 0, 4, 5, x + (i * 4), y, 4, 5);
+            ctxUI.drawImage(fontImg, DEFAULT_STRING.indexOf(char) * 4, 0, 4, 5, x + (i * 4), y, 4, 5);
         }
     }
 }
