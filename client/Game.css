@@ -33,7 +33,7 @@ body {
 }
 
 .player-names {
-    z-index: 10;
+    z-index: 3;
     position: absolute;
 }
 
@@ -57,7 +57,7 @@ input[type=text], select {
     box-sizing: border-box;
     font-family: fot-seurat-pron,sans-serif;
 }
-  
+
 input[type=submit] {
     width: 100%;
     background-color: #4CAF50;
@@ -68,11 +68,11 @@ input[type=submit] {
     border-radius: 4px;
     cursor: pointer;
 }
-  
+
 input[type=submit]:hover {
     background-color: #45a049;
 }
-  
+
 #name-input {
     border-radius: 5px;
     background-color: #464646;
@@ -83,6 +83,6 @@ input[type=submit]:hover {
 }
 
 #text-layer { z-index: 4; }
-#ui-layer { z-index: 3; }
+#ui-layer { z-index: 4; }
 #entity-layer { z-index: 2; }
 #screen-layer { z-index: 1; }

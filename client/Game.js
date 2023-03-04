@@ -76,7 +76,7 @@ let localPlayer = {
     animID: 0,
     // states
     canJump: 0,
-    maxJumps: 1,
+    maxJumps: 2,
     canDash: 0,
     dashTimer: 0,
     dashDir: 0,
@@ -97,14 +97,19 @@ let localColor = null;
 let PLAYER_LIST = [];
 let connected = 0;
 
+let totalBananas = 33;
+
 let text = [
     "COLLECT ALL THE BANANAS TO OPEN THE FINAL LEVEL",
-    "NOTHING TO DO HERE...",
-    "VERY OMINOUS",
-    "PRESS UP TO GO THROUGH DOOR",
+    "The hungry squishy species is very rare",
+    "PLEASE LEAVE THE JOHN ROOMm",
+    "",
     "CONGRATS",
     "YOU DIDN'T THINK THIS WAS THE END, DID YOU?",
     "NOW SUFFER",
+    "Z TO JUMP, X TO DASH",
+    "YOU CAN DASH THROUGH LAVA",
+    "We must save the last survivor"
 ]
 
 function startTimer() {
@@ -132,12 +137,12 @@ socket.on('initClient', function(data) {
 
 socket.on('updateClient', function(data) {
     // Update players
-    PLAYER_LIST = data.players;
-    PLAYER_LIST[PLAYER_LIST.indexOf(PLAYER_LIST.find(({ socketID }) => socketID === socketID))] = localPlayer;
+    //PLAYER_LIST = data.players;
+    //PLAYER_LIST[PLAYER_LIST.indexOf(PLAYER_LIST.find(({ socketID }) => socketID === socketID))] = localPlayer;
     
     for (let i = 0; i < data.players.length; i++) {
         if (i != localID) {
-            PLAYER_LIST[i] = data.players[i]
+            PLAYER_LIST[i] = data.players[i];
         }
     }
 
@@ -197,8 +202,17 @@ function draw() {
             if (touchSign) {
                 let img = document.getElementById(`textbox`);
                 ctxUI.drawImage(img,16,16);
-                drawText(touchSign, 26, 21, 7, 1); 
+                if (touchSign == "Done") {
+                    drawText("That was yummy...", 26, 21, 7, 1);
+                    drawText("Now I can star in my own game!", 26, 29, 7, 1);
+                    drawText("(YOU HAVE FINISHED THE GAME)", 26, 37, 7, 1);  
+                } else {
+                    drawText(touchSign, 26, 21, 7, 1); 
+                }
             }
+        } else if (i.__identifier == "Hungry") {
+            let img = document.getElementById(`hungry`);
+            ctxEntity.drawImage(img,0,0,8,8,i.px[0] - cam.x,i.px[1] - cam.y,8,8);
         }
     }
 
@@ -249,7 +263,10 @@ function playerUpdate(p) {
         p.canDash = 1;
         p.color = p.colorSave;
     }
-    else { p.isOnGround = 0; }
+    else {
+        p.isOnGround = 0;
+        if (p.canJump == 2) { p.canJump = 1; }
+    }
     p.wallJumpDelay = Math.max(p.wallJumpDelay-1,0);
 
     if (AXIS[1] != 0) { p.facing = AXIS[1] }
@@ -268,8 +285,9 @@ function playerUpdate(p) {
         p.jumpSpd = -1500;
         p.fallSpd = 1000;
         p.lastState = 3;
-        p.canJump = 1;
+        p.canJump = p.maxJumps;
         p.canDash = 1;
+        p.color = p.colorSave;
     } else {
         p.grav = Physics.grav;
         p.accel = Physics.accel;
@@ -534,6 +552,7 @@ function entityCollisions(obj) {
             if (i.__identifier == "Collectable" && !i.fieldInstances[1].__value) {
                 i.fieldInstances[1].__value = 1;
                 localPlayer.bananaCounter++;
+                totalBananas--;
             } else if (i.__identifier == "Change_Area") {
                 let nextScreen = i.fieldInstances[0].__value;
                 let nextDir = i.fieldInstances[1].__value;
@@ -551,6 +570,11 @@ function entityCollisions(obj) {
                 obj.enteredY = obj.y;
             } else if (i.__identifier == "Sign") {
                 touchSign = text[i.fieldInstances[0].__value];
+                if (i.fieldInstances[0].__value == 3 && totalBananas != 0) {
+                    touchSign = `Please feed me ${totalBananas} yummy bananas :D`;
+                } else if (i.fieldInstances[0].__value == 3 && totalBananas == 0) {
+                    touchSign = "Done";
+                }
             } else if (i.__identifier == "DoubleJump") {
                 obj.maxJumps = 2;
             } else if (i.__identifier == "Door" && BTN[0]>0) {
