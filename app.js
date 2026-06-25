@@ -1,14 +1,20 @@
 let express = require('express');
 let app = express();
+const cors = require('cors');
 let serv = require('http').Server(app);
+
+// Enable CORS
+app.use(cors());
 
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/client/index.html');
 });
 app.use('/client', express.static(__dirname + '/client'));
+//app.use(express.static('client'));
 
 serv.listen(4000);
 console.log("Server started.");
+console.log("http://localhost:4000");
 
 let SOCKET_LIST = [];
 let PLAYER_LIST = [];

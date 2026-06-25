@@ -1,5 +1,5 @@
 import { Lerp, Clamp } from './Util.js';
-import * as initWORLD from "./levels/World2.json" assert { type: "json" };
+import * as initWORLD from "./levels/World2.json" with { type: 'json' };
 
 console.clear();
 
@@ -17,7 +17,7 @@ let DEFAULT_STRING = ` !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXY
 let ctxUI = document.getElementById("ui-layer").getContext("2d");
 let ctxEntity = document.getElementById("entity-layer").getContext("2d");
 let ctxScreen = document.getElementById("screen-layer").getContext("2d");
-let ctxText = document.getElementById("text-layer").getContext("2d");
+let ctxText = document.getElementById("text-layer").getContext("2d"); // Remove this
 
 ctxEntity.imageSmoothingEnabled = false;
 ctxScreen.imageSmoothingEnabled = false;
