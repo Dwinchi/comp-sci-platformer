@@ -1,4 +1,4 @@
-import { Clamp, Touching } from './Util.js';
+import { Clamp, Touching } from './util.js';
 import { Physics, Cam, GC, BTN, AXIS, Transition } from "./Game.js";
 
 export class Enemy {

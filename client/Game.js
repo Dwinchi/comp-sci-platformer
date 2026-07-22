@@ -1,4 +1,4 @@
-import { Lerp, Clamp } from './Util.js';
+import { lerp, clamp } from './util.js';
 import * as initWORLD from "./levels/World2.json" with { type: 'json' };
 
 console.clear();
@@ -6,7 +6,8 @@ console.clear();
 let WORLD = initWORLD.default;
 let WORLD_ID = 2;
 
-let socket = io();
+let socket = io(); // Loads from script from index.html 
+// Shouldnt do this for an offline client version
 
 let SCREEN_HEIGHT = 144;
 let SCREEN_WIDTH = 256;
@@ -17,7 +18,6 @@ let DEFAULT_STRING = ` !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXY
 let ctxUI = document.getElementById("ui-layer").getContext("2d");
 let ctxEntity = document.getElementById("entity-layer").getContext("2d");
 let ctxScreen = document.getElementById("screen-layer").getContext("2d");
-let ctxText = document.getElementById("text-layer").getContext("2d"); // Remove this
 
 ctxEntity.imageSmoothingEnabled = false;
 ctxScreen.imageSmoothingEnabled = false;
@@ -52,9 +52,9 @@ let keys = [
 
 let BTN = [0,0,0,0,0,0,0,0];
 let AXIS = [0,0];
-let localID = null;
+let localId = null;
 let localPlayer = {
-    playerID: null,
+    playerId: null,
     color: null,
     colorSave: null,
     name: "localName",
@@ -97,7 +97,7 @@ let localColor = null;
 let PLAYER_LIST = [];
 let connected = 0;
 
-let totalBananas = 33;
+let total_bananas = 33;
 
 let text = [
     "COLLECT ALL THE BANANAS TO OPEN THE FINAL LEVEL",
@@ -118,15 +118,15 @@ function startTimer() {
 }
 
 socket.on('initClient', function(data) {
-    localID = data.localID;
+    localId = data.localId;
     PLAYER_LIST = data.PLAYER_LIST;
     connected = 1;
 
-    let l = WORLD.levels[data.screenID].layerInstances[0].entityInstances.find(({ __identifier }) => __identifier === "Player");
+    let l = WORLD.levels[data.screenId].layerInstances[0].entityInstances.find(({ __identifier }) => __identifier === "Player");
     
-    localPlayer.socketID = data.socketID;
-    localPlayer.playerID = data.localID;
-    localPlayer.screen = data.screenID;
+    localPlayer.socketId = data.socketId;
+    localPlayer.playerId = data.localId;
+    localPlayer.screen = data.screenId;
     localPlayer.x = l.px[0];
     localPlayer.y = l.px[1];
     localPlayer.xInt = localPlayer.x;
@@ -138,10 +138,10 @@ socket.on('initClient', function(data) {
 socket.on('updateClient', function(data) {
     // Update players
     //PLAYER_LIST = data.players;
-    //PLAYER_LIST[PLAYER_LIST.indexOf(PLAYER_LIST.find(({ socketID }) => socketID === socketID))] = localPlayer;
+    //PLAYER_LIST[PLAYER_LIST.indexOf(PLAYER_LIST.find(({ socketId }) => socketId === socketId))] = localPlayer;
     
     for (let i = 0; i < data.players.length; i++) {
-        if (i != localID) {
+        if (i != localId) {
             PLAYER_LIST[i] = data.players[i];
         }
     }
@@ -153,13 +153,13 @@ function update() {
     tick();
 
     if (connected == 1) {
-        //let id = PLAYER_LIST.indexOf(PLAYER_LIST.find(({ socketID }) => socketID === socketID));
+        //let id = PLAYER_LIST.indexOf(PLAYER_LIST.find(({ socketId }) => socketId === socketId));
 
         playerUpdate(localPlayer);
 
         let pack = {
-            socketID: localPlayer.socketID,
-            playerID: localPlayer.playerID,
+            socketId: localPlayer.socketId,
+            playerId: localPlayer.playerId,
             name: localPlayer.name,
             color: localPlayer.color,
             x: localPlayer.x,
@@ -175,7 +175,7 @@ function update() {
             si: localPlayer.si,
             sr: localPlayer.sr,
         }
-        PLAYER_LIST[localID] = pack;
+        PLAYER_LIST[localId] = pack;
         socket.emit('updateServer', pack);
 
         draw();
@@ -183,7 +183,7 @@ function update() {
 }
 
 function draw() {
-    // Pretty much just a new draw function
+    // Clear canvases
     ctxEntity.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     ctxScreen.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     ctxUI.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -192,7 +192,7 @@ function draw() {
     cam.img = document.getElementById(`W${WORLD_ID}_Screen_${localPlayer.screen}`);
     ctxScreen.drawImage(cam.img,cam.x,cam.y,SCREEN_WIDTH,SCREEN_HEIGHT,0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
     
-    for (let i of WORLD.levels[PLAYER_LIST[localID].screen].layerInstances[0].entityInstances) {
+    for (let i of WORLD.levels[PLAYER_LIST[localId].screen].layerInstances[0].entityInstances) {
         if (i.__identifier == "Collectable" && i.fieldInstances[1].__value == 0) {
             let img = document.getElementById(`food-${i.fieldInstances[0].__value}`);
             ctxEntity.drawImage(img,0,0,8,8,i.px[0] - cam.x,i.px[1] - cam.y,8,8);
@@ -220,7 +220,7 @@ function draw() {
     for (let i = 0; i < PLAYER_LIST.length; i++) {
         let p = PLAYER_LIST[i];
         console.log(PLAYER_LIST.length);
-        if (p != null && p.screen == PLAYER_LIST[localID].screen) {
+        if (p != null && p.screen == PLAYER_LIST[localId].screen) {
             // Draw name
             let txt = document.getElementById(`p${i}-name`);
             if (txt == null) {
@@ -337,7 +337,7 @@ function playerUpdate(p) {
             p.xSpd -= (p.deccel * Math.sign(p.xSpd));
             if (!p.xSpd) { p.x =  Math.floor(p.x); }
         }
-        p.xSpd = Clamp(p.xSpd,-p.maxSpd,p.maxSpd);
+        p.xSpd = clamp(p.xSpd,-p.maxSpd,p.maxSpd);
     }
     if (Touching(p, p.x + (1 * Math.sign(p.xSpd)), p.y, 1)) {
         p.isOnWall = 1;
@@ -363,7 +363,7 @@ function playerUpdate(p) {
     // Normal gravity
     else if (!p.isOnGround) { p.ySpd += p.grav; }
 
-    p.ySpd = Clamp(p.ySpd,-p.fallSpd,p.fallSpd);
+    p.ySpd = clamp(p.ySpd,-p.fallSpd,p.fallSpd);
     
     // Horizontal collision
     if (Touching(p, p.x + (p.xSpd/1000), p.y, 1)) {
@@ -378,7 +378,7 @@ function playerUpdate(p) {
         while (!Touching(p, p.x, p.y + Math.sign(p.ySpd), 1)) { p.y += Math.sign(p.ySpd); }
         p.ySpd = 0;
     }
-    //p.y += (p.ySpd / 1000);
+
     p.y += (Math.abs(p.ySpd) / 1000) * Math.sign(p.ySpd);
     p.yInt = Math.floor(p.y);
 
@@ -435,11 +435,11 @@ function playerUpdate(p) {
     //* Camera follows object
     if (WORLD.levels[p.screen].pxWid > SCREEN_WIDTH) {
         p.cam.x = p.x - (SCREEN_WIDTH / 2) - 4;
-        p.cam.x = Clamp(p.cam.x, 0, WORLD.levels[p.screen].pxWid - SCREEN_WIDTH);
+        p.cam.x = clamp(p.cam.x, 0, WORLD.levels[p.screen].pxWid - SCREEN_WIDTH);
     } else { p.cam.x = 0; }
     if (WORLD.levels[p.screen].pxHei > SCREEN_HEIGHT) {
         p.cam.y = p.y - (SCREEN_HEIGHT / 2) - 4;
-        p.cam.y = Clamp(p.cam.y, 0, WORLD.levels[p.screen].pxHei - SCREEN_HEIGHT);
+        p.cam.y = clamp(p.cam.y, 0, WORLD.levels[p.screen].pxHei - SCREEN_HEIGHT);
     } else { p.cam.y = 0; }
 }
 
@@ -552,7 +552,7 @@ function entityCollisions(obj) {
             if (i.__identifier == "Collectable" && !i.fieldInstances[1].__value) {
                 i.fieldInstances[1].__value = 1;
                 localPlayer.bananaCounter++;
-                totalBananas--;
+                total_bananas--;
             } else if (i.__identifier == "Change_Area") {
                 let nextScreen = i.fieldInstances[0].__value;
                 let nextDir = i.fieldInstances[1].__value;
@@ -570,9 +570,9 @@ function entityCollisions(obj) {
                 obj.enteredY = obj.y;
             } else if (i.__identifier == "Sign") {
                 touchSign = text[i.fieldInstances[0].__value];
-                if (i.fieldInstances[0].__value == 3 && totalBananas != 0) {
-                    touchSign = `Please feed me ${totalBananas} yummy bananas :D`;
-                } else if (i.fieldInstances[0].__value == 3 && totalBananas == 0) {
+                if (i.fieldInstances[0].__value == 3 && total_bananas != 0) {
+                    touchSign = `Please feed me ${total_bananas} yummy bananas :D`;
+                } else if (i.fieldInstances[0].__value == 3 && total_bananas == 0) {
                     touchSign = "Done";
                 }
             } else if (i.__identifier == "DoubleJump") {
@@ -600,38 +600,22 @@ function Touching(obj, x, y, checkFor) {
     x = Math.floor(x);
     y = Math.floor(y);
 
-    let x1;
-    let x2;
-    let y1;
-    let y2;
-    let t0;
-    let t1;
-    let t2;
-    let t3;
-
     let l = WORLD.levels[obj.screen].layerInstances[1];
 
-    x1 = Math.floor(x / 8);
-    x2 = Math.floor((x + obj.w) / 8);
-    y1 = Math.floor(y / 8);
-    y2 = Math.floor((y + obj.h) / 8);
+    let x1 = Math.floor(x / 8);
+    let x2 = Math.floor((x + obj.w) / 8);
+    let y1 = Math.floor(y / 8);
+    let y2 = Math.floor((y + obj.h) / 8);
 
-    t0 = l.intGridCsv[x1 + (y1 * (l.__cWid))];
-    t1 = l.intGridCsv[x2 + (y1 * (l.__cWid))];
-    t2 = l.intGridCsv[x1 + (y2 * (l.__cWid))];
-    t3 = l.intGridCsv[x2 + (y2 * (l.__cWid))];
+    let t0 = l.intGridCsv[x1 + (y1 * (l.__cWid))];
+    let t1 = l.intGridCsv[x2 + (y1 * (l.__cWid))];
+    let t2 = l.intGridCsv[x1 + (y2 * (l.__cWid))];
+    let t3 = l.intGridCsv[x2 + (y2 * (l.__cWid))];
 
-    if (t1 == checkFor || t0 == checkFor) {
-        return checkFor;
-    } else if (t2 == checkFor || t3 == checkFor) {
+    if (t1 == checkFor || t0 == checkFor || t2 == checkFor || t3 == checkFor) {
         return checkFor;
     }
 
-    if (t1 == checkFor || t3 == checkFor) {
-        return checkFor;
-    } else if (t0 == checkFor || t2 == checkFor) {
-        return checkFor;
-    }
     return 0;
 }
 
